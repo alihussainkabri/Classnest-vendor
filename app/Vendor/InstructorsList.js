@@ -75,7 +75,7 @@ const InstructorsList = () => {
                     </ScrollView>
 
                     <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity activeOpacity={.8} style={[styles.whiteBTN]}>
+                        <TouchableOpacity onPress={() => router.push('')} activeOpacity={.8} style={[styles.whiteBTN]}>
                             <Text style={styles.WhiteBTNText}>Continue</Text>
                         </TouchableOpacity>
                     </View>
