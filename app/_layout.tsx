@@ -65,31 +65,17 @@ export default function RootLayout() {
               <Stack.Screen name="Vendor/ReviewDetails" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/DetailSuccess" options={{ presentation: 'modal', title: 'yes' }} />
 
-<<<<<<< HEAD
               <Stack.Screen name="Vendor/ListingClass1" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/ListingClass2" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} />
+              <Stack.Screen name="Vendor/ReceiveEnquiries" options={{ presentation: 'modal', title: 'yes' }} />
+              <Stack.Screen name="Vendor/UploadClassImage" options={{ presentation: 'modal', title: 'yes' }} />
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>
         </GluestackUIProvider>
-      </UserContext>
-    </>
-=======
-          <Stack.Screen name="Vendor/ListingClass1" options={{ presentation: 'modal', title: 'yes' }} />
-          <Stack.Screen name="Vendor/ListingClass2" options={{ presentation: 'modal', title: 'yes' }} />
-          <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
-          <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} />
-          <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} />
-          <Stack.Screen name="Vendor/ReceiveEnquiries" options={{ presentation: 'modal', title: 'yes' }} />
-          {/* <Stack.Screen name="Vendor/UploadClassImage" options={{ presentation: 'modal', title: 'yes' }} /> */}
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </GluestackUIProvider>
->>>>>>> d1f2fdc793df26a37631dda90eb26b2834eb4ae9
 
-  );
+        );
 }
