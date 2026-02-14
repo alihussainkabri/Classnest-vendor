@@ -1,16 +1,21 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { OtpInput } from "react-native-otp-entry";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 const Verification = ({ navigation }) => {
-    const [value, setValue] = useState('')
-    const [countryCode, setCountryCode] = useState('US');
+    const {setUser} = useContext(userContext)
     const [isSecure, setIsSecure] = useState(true);
     const timerRef = useRef(null);
+    const { mobile_number,newly_created } = useLocalSearchParams()
+    const [otp,setOTP] = useState("")
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
@@ -26,7 +31,79 @@ const Verification = ({ navigation }) => {
         }, 1000);
 
         console.log("Current OTP:", text);
+        setOTP(text)
     };
+
+    const [seconds, setSeconds] = useState(30);
+    const [enabled, setEnabled] = useState(false);
+
+    useEffect(() => {
+        if (seconds === 0) {
+            setEnabled(true);
+            return;
+        }
+
+        const timer = setInterval(() => {
+            setSeconds((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [seconds]);
+
+    const handleResend = async () => {
+        if (!enabled) return;
+
+        Toast.success("Code resent!");
+        setSeconds(30);
+        setEnabled(false);
+
+        const formData = new FormData()
+        formData.append("mobile_number", mobile_number)
+        formData.append("module", 'vendor')
+
+        const response = await fetch(url + "generate-otp", {
+            method: 'POST',
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            if (data.status == 200) {
+                Toast.success(data?.message)
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    };
+
+    async function verifyOTP() {
+        const formData = new FormData()
+        formData.append("mobile_number", mobile_number)
+        formData.append("otp", otp)
+
+        const response = await fetch(url + "verify-otp", {
+            method: 'POST',
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            console.log(data)
+            if (data.status == 200) {
+                setUser(data?.user_data)
+                AsyncStorage.setItem("classnest_vendor",JSON.stringify(data?.user_data))
+                Toast.success(data?.message)
+
+                if (newly_created == true){
+                    setTimeout(() => {
+                       router.push('Auth/Success') 
+                    }, 200);
+                }
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -37,7 +114,7 @@ const Verification = ({ navigation }) => {
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
                     <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 18 }}>Verification Code</Text>
-                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>We’ve sent a WhatsApp OTP to +91 XXXXXXXX.</Text>
+                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>We’ve sent a WhatsApp OTP to +91 {mobile_number}.</Text>
                     <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Enter the 6 digit code below to continue.</Text>
                 </View>
             </ImageBackground>
@@ -45,7 +122,7 @@ const Verification = ({ navigation }) => {
             <View style={{ marginHorizontal: 16, flex: 1, justifyContent: 'space-between' }}>
                 <View>
                     <OtpInput
-                        numberOfDigits={6}
+                        numberOfDigits={4}
                         focusColor="grey"
                         autoFocus={false}
                         hideStick={true}
@@ -53,7 +130,6 @@ const Verification = ({ navigation }) => {
                         blurOnFilled={true}
                         disabled={false}
                         type="numeric"
-                        secureTextEntry={isSecure}
                         focusStickBlinkingDuration={500}
                         onFocus={() => console.log("Focused")}
                         onBlur={() => console.log("Blurred")}
@@ -78,10 +154,20 @@ const Verification = ({ navigation }) => {
                 </View>
 
                 <View style={{ alignItems: 'center' }}>
-                    <TouchableOpacity>
-                        <Text style={{color: colors.primary, fontFamily: fonts.IntSB}}>Resend Code <Text>(30 sec)</Text></Text>
+                    <TouchableOpacity disabled={!enabled} onPress={handleResend}>
+                        <Text style={{ color: enabled ? colors.primary : "gray", fontFamily: fonts.IntSB }}>
+                            Resend Code{" "}
+                            {!enabled && <Text>({seconds} sec)</Text>}
+                        </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => router.push('Auth/Success')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: 12 + inset.bottom }]}>
+                    <TouchableOpacity onPress={() => {
+                        if (otp.length == 4){
+                            verifyOTP()
+                            
+                        }else{
+                            Toast.error("Please enter OTP")
+                        }
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: 12 + inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Verify</Text>
                     </TouchableOpacity>
                 </View>

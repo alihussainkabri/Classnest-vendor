@@ -7,18 +7,53 @@ import {
 import { CheckIcon } from '@/components/ui/icon';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PhoneInput from "react-native-phone-number-input";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { url } from '../../helpers';
 
 const Login = ({ navigation }) => {
     const [value, setValue] = useState('')
-    const [countryCode, setCountryCode] = useState('US');
+    const [countryCode, setCountryCode] = useState('IN');
+    const [checked, setChecked] = useState(false);
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
+
+    async function generateOTP() {
+        const formData = new FormData()
+        formData.append("mobile_number", value)
+        formData.append("module", 'vendor')
+
+        const response = await fetch(url + "generate-otp", {
+            method: 'POST',
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            console.log(data)
+            if (data.status == 200) {
+                Toast.success(data?.message)
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Auth/Verification',
+                        params: {
+                            mobile_number: value,
+                            newly_created : data?.newly_created
+                        }
+                    })
+                }, 200);
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
+
+
 
     return (
         <View style={styles.container}>
@@ -64,21 +99,28 @@ const Login = ({ navigation }) => {
                 </View>
 
                 <View style={{ alignItems: 'center' }}>
-                    <Checkbox isDisabled={false} isInvalid={false} size="md">
+                    <Checkbox
+                        onChange={(isChecked) => setChecked(isChecked)} isDisabled={false} isInvalid={false} size="md">
                         <CheckboxIndicator style={{ borderRadius: 0 }}>
                             <CheckboxIcon as={CheckIcon} />
                         </CheckboxIndicator>
                         <CheckboxLabel><Text style={{ fontFamily: fonts.IntMed, fontSize: 9, color: '#666668' }}>By continuing, you agree to the Terms & Privacy Policy.</Text></CheckboxLabel>
                     </Checkbox>
 
-                    <TouchableOpacity onPress={() => router.push('Auth/Verification')} activeOpacity={.8} style={styles.whiteBTN}>
+                    <TouchableOpacity onPress={() => {
+                        if (value.length == 10 && countryCode && checked) {
+                            generateOTP()
+                        } else {
+                            Toast.error("Please fill all details")
+                        }
+                    }} activeOpacity={.8} style={styles.whiteBTN}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
 
                     <Text style={{ fontFamily: fonts.IntMed, fontSize: 9, color: '#9DA2A6', marginTop: 4, marginBottom: 12 + inset.bottom }}>Your gateway to the best classes nearby</Text>
                 </View>
             </View>
-        </View>
+        </View >
     )
 }
 
