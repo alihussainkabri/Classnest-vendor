@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,7 +13,6 @@ import { node_url, url } from '../../helpers';
 const SelectCourses = () => {
     const inset = useSafeAreaInsets()
     const [selected, setSelected] = useState([]);
-    const { accountType, name } = useLocalSearchParams()
     const { user,setUser } = useContext(userContext)
     const [skills, setSkills] = useState([])
 

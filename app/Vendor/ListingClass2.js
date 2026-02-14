@@ -1,38 +1,38 @@
 import { HStack } from '@/components/ui/hstack';
-import { Input, InputField } from '@/components/ui/input';
-import {
-    Select,
-    SelectBackdrop,
-    SelectContent,
-    SelectDragIndicator,
-    SelectDragIndicatorWrapper,
-    SelectInput,
-    SelectItem,
-    SelectPortal,
-    SelectTrigger
-} from '@/components/ui/select';
-import { Textarea, TextareaInput } from '@/components/ui/textarea';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { Input, InputField, InputSlot } from '@/components/ui/input';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import * as Location from 'expo-location';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 
 const ListingClass2 = () => {
     const inset = useSafeAreaInsets()
-
+    const { user } = useContext(userContext)
+    const { class_id, formatted } = useLocalSearchParams()
     const [classMode, setClassMode] = useState('Online')
-    const [city, setCity] = useState()
-
-
-    const [region, setRegion] = useState(null);
-    const [marker, setMarker] = useState(null);
+    const [city, setCity] = useState("")
+    const [state, setState] = useState("")
+    const [country, setCountry] = useState("")
     const [address, setAddress] = useState('');
+    useEffect(() => {
+        if (formatted) {
+            setCountry(JSON?.parse(formatted)?.country)
+            setState(JSON?.parse(formatted)?.state)
+            setCity(JSON?.parse(formatted)?.city)
+            setAddress(JSON?.parse(formatted)?.fullAddress)
+        }
+    }, [formatted])
+
+
+
+
+
     const [selectedGroups, setSelectedGroups] = useState([]);
 
     const AGE_GROUPS = [
@@ -51,59 +51,47 @@ const ListingClass2 = () => {
         );
     };
 
-    async function useCurrentLocation() {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') return;
+    async function submit() {
+        const formData = new FormData()
 
-        const current = await Location.getCurrentPositionAsync({});
-        const coords = {
-            latitude: current.coords.latitude,
-            longitude: current.coords.longitude,
-        };
+        formData.append("mode_of_class", classMode)
+        formData.append("class_location", JSON.stringify({
+            latitude: JSON?.parse(formatted)?.latitude,
+            longitude: JSON?.parse(formatted)?.longitude,
+            city,
+            state,
+            country,
+            address
+        }))
+        formData.append("age_groups", JSON.stringify(selectedGroups))
 
-        setRegion({
-            ...coords,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-        });
-
-        setMarker(coords);
-        fetchAddress(coords);
-    };
-
-    async function fetchAddress({ latitude, longitude }) {
-        const geo = await Location.reverseGeocodeAsync({ latitude, longitude });
-        if (geo.length > 0) {
-            const p = geo[0];
-            setAddress(
-                `${p.name || ''}, ${p.city || ''}, ${p.region || ''}`
-            );
-        }
-    };
-
-    const onMapPress = async (e) => {
-        const coords = e.nativeEvent.coordinate;
-        setMarker(coords);
-        fetchAddress(coords);
-    };
-
-    const onConfirm = () => {
-        router.replace({
-            pathname: '../PreviousScreen',
-            params: {
-                location: JSON.stringify({
-                    ...marker,
-                    address,
-                }),
+        const response = await fetch(url + `create-class-step2/${class_id}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
             },
-        });
-    };
+            body: formData
+        })
 
-    // if (!region) return <Text>Loading map...</Text>;
+        if (response.ok == true) {
+            const data = await response.json()
 
-    useEffect(() => {
-        useCurrentLocation();
-    }, []);
+            if (data.status == 200) {
+                console.log(data)
+                Toast.success("Class Created Successfully!")
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/ListingClass3',
+                        params: {
+                            class_id: class_id
+                        }
+                    })
+                }, 300);
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
@@ -138,96 +126,40 @@ const ListingClass2 = () => {
                             </HStack>
 
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Class Location</Text>
-                            <Select style={{ marginTop: 12, }}>
-                                <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                                    <SelectInput placeholder="Area, street and landmark" style={{ color: 'black', fontSize: 13 }} fontFamily={fonts.IntReg} fontSize={13} />
-                                    <FontAwesome6 name="location-dot" size={16} color="black" style={{ marginHorizontal: 12 }} />
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectBackdrop />
-                                    <SelectContent>
-                                        <SelectDragIndicatorWrapper>
-                                            <SelectDragIndicator />
-                                        </SelectDragIndicatorWrapper>
-                                        <SelectItem label="UX Research" value="ux" />
-                                        <SelectItem label="Web Development" value="web" />
-                                        <SelectItem
-                                            label="Cross Platform Development Process"
-                                            value="Cross Platform Development Process"
-                                        />
-                                        <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                                        <SelectItem label="Backend Development" value="backend" />
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
-
-                            {/* <MapView
-                                style={styles.map}
-                                region={region}
-                                onPress={onMapPress}
+                            <Input
+                                variant="none"
+                                size="lg"
+                                isRequired
+                                style={{ height: 42, marginTop: 12 }}
                             >
-                                {marker && <Marker coordinate={marker} />}
-                            </MapView>
+                                <InputField value={address} onChangeText={setAddress} placeholder="Full Address" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
 
-                            <TouchableOpacity style={styles.locateBtn} onPress={useCurrentLocation}>
-                                <Text style={styles.locateText}>Use My Current Location</Text>
-                            </TouchableOpacity>
-
-                            <View style={styles.footer}>
-                                <Text style={styles.address}>{address}</Text>
-
-                                <TouchableOpacity style={styles.confirmBtn} onPress={onConfirm}>
-                                    <Text style={styles.confirmText}>Confirm Location</Text>
-                                </TouchableOpacity>
-                            </View> */}
-
-                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Class description </Text>
-                            <Textarea
-                                size="md"
-                                isReadOnly={false}
-                                isInvalid={false}
-                                isDisabled={false}
-                                style={{ width: '100%', borderWidth: 0, marginTop: 12 }}
-                            >
-                                <TextareaInput style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="What will students learn? Mention skills, levels, and outcomes." />
-                            </Textarea>
+                                <InputSlot pr={12}>
+                                    <TouchableOpacity onPress={() => {
+                                        router.push({
+                                            pathname: 'Maps/LocationPickerScreen',
+                                            params: {
+                                                redirect_screen: "Vendor/ListingClass2",
+                                                class_id: class_id
+                                            }
+                                        })
+                                    }}>
+                                        <Ionicons name="map" size={20} color="#666D80" />
+                                    </TouchableOpacity>
+                                </InputSlot>
+                            </Input>
 
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Country</Text>
-                            <Select style={{ marginTop: 12, }}>
-                                <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                                    <SelectInput style={{ color: 'black', fontSize: 13 }} placeholder="Select Country" fontFamily={fonts.IntReg} fontSize={13} />
-                                    <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectBackdrop />
-                                    <SelectContent>
-                                        <SelectDragIndicatorWrapper>
-                                            <SelectDragIndicator />
-                                        </SelectDragIndicatorWrapper>
-                                        <SelectItem label="UX Research" value="ux" />
-                                        <SelectItem label="Web Development" value="web" />
-                                        <SelectItem
-                                            label="Cross Platform Development Process"
-                                            value="Cross Platform Development Process"
-                                        />
-                                        <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                                        <SelectItem label="Backend Development" value="backend" />
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
+                            <Input
+                                variant="none"
+                                size="lg"
+                                isRequired
+                                style={{ height: 42, marginTop: 12 }}
+                            >
+                                <InputField value={country} placeholder="Country" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                            </Input>
 
                             <HStack space="md" style={{ marginTop: 16 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>City</Text>
-                                    <Input
-                                        variant="none"
-                                        size="lg"
-                                        isRequired
-                                        style={{ height: 42, marginTop: 12 }}
-                                    >
-                                        <InputField value={city} onChangeText={setCity} placeholder="Enter City" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
-                                    </Input>
-                                </View>
 
                                 <View style={{ flex: 1 }}>
                                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>State</Text>
@@ -237,7 +169,19 @@ const ListingClass2 = () => {
                                         isRequired
                                         style={{ height: 42, marginTop: 12 }}
                                     >
-                                        <InputField value={city} onChangeText={setCity} placeholder="Enter State" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                        <InputField value={state} onChangeText={setCity} placeholder="Enter State" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                    </Input>
+                                </View>
+
+                                <View style={{ flex: 1 }}>
+                                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>City</Text>
+                                    <Input
+                                        variant="none"
+                                        size="lg"
+                                        isRequired
+                                        style={{ height: 42, marginTop: 12 }}
+                                    >
+                                        <InputField value={city} onChangeText={setCity} placeholder="Enter City" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                                     </Input>
                                 </View>
                             </HStack>
@@ -262,7 +206,13 @@ const ListingClass2 = () => {
                     </ScrollView>
 
                     <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => router.push('Vendor/ListingClass3')} activeOpacity={.8} style={[styles.whiteBTN]}>
+                        <TouchableOpacity onPress={() => {
+                            if (classMode && address && state && city && country && selectedGroups.length > 0) {
+                                submit()
+                            } else {
+                                Toast.error("Please fill all details")
+                            }
+                        }} activeOpacity={.8} style={[styles.whiteBTN]}>
                             <Text style={styles.WhiteBTNText}>Continue to class setup</Text>
                         </TouchableOpacity>
                     </View>
