@@ -1,17 +1,82 @@
+import {
+    Modal,
+    ModalBackdrop,
+    ModalContent
+} from '@/components/ui/modal';
+import Entypo from '@expo/vector-icons/Entypo';
+import Feather from '@expo/vector-icons/Feather';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
+;
+
 
 const UploadClassImage = ({ navigation }) => {
     const [value, setValue] = useState('')
     const [countryCode, setCountryCode] = useState('US');
     const [enquiryType, setEnquiryType] = useState('');
+    const [image, setImage] = useState(null);
+    const [showModal, setShowModal] = React.useState(false);
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
+
+    const requestPermissions = async () => {
+        const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+        const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (!cameraPermission.granted || !mediaPermission.granted) {
+            Alert.alert("Permission required");
+            return false;
+        }
+        return true;
+    };
+
+    const pickFromGallery = async () => {
+        const hasPermission = await requestPermissions();
+        if (!hasPermission) {
+            setShowModal(false)
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.7,
+        });
+
+        if (!result.canceled) {
+            console.log(result.assets[0].uri);
+            setImage(result.assets[0].uri);
+
+            setShowModal(false)
+        }
+    };
+
+    const openCamera = async () => {
+        const hasPermission = await requestPermissions();
+        if (!hasPermission) {
+            setShowModal(false)
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            quality: 0.7,
+        });
+
+        if (!result.canceled) {
+            console.log(result.assets[0].uri);
+            setImage(result.assets[0].uri);
+
+            setShowModal(false)
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -28,13 +93,45 @@ const UploadClassImage = ({ navigation }) => {
 
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <View style={{ marginHorizontal: 16, }}>
-                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{fontFamily:fonts.IntMed, fontSize: 12}}>(max : 10)</Text></Text>
-                    
-                    
+                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
+
+                    <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
+                        <View style={{flexDirection :'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
+                            <Feather name="upload" size={24} color="#002858" />
+                            <Text style={{fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8}}>Upload</Text>
+                        </View>
+
+                        <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
+                        <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
+                    </TouchableOpacity>
+
+                    {image && (
+                        <Image
+                            source={{ uri: image }}
+                            style={{ width: 200, height: 200, marginTop: 20 }}
+                        />
+                    )}
                 </View>
 
+                <Modal isOpen={showModal} onClose={() => { setShowModal(false) }} size="full">
+                    <ModalBackdrop />
+                    <ModalContent className="mt-auto w-[80%] self-center rounded-3xl bg-white border-0" style={{ marginBottom: Dimensions.get('window').height / 100 * 14, height: 126 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 36 }}>
+                            <TouchableOpacity onPress={pickFromGallery}>
+                                <FontAwesome name="folder-open" style={styles.Modalicon} />
+                                <Text style={styles.modalTXT}>File</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={openCamera}>
+                                <Entypo name="camera" style={styles.Modalicon} />
+                                <Text style={styles.modalTXT}>Camera</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ModalContent>
+                </Modal>
+
                 <View style={{ alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => router.push('Vendor/ReceiveEnquiries')} activeOpacity={.8} style={[styles.whiteBTN ,{ marginBottom: inset.bottom}]}>
+                    <TouchableOpacity onPress={() => router.push('Vendor/ReceiveEnquiries')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>
@@ -79,6 +176,29 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
     },
+    Modalicon: {
+        fontSize: 40,
+        color: "white",
+        backgroundColor: colors.primary,
+        alignSelf: 'flex-start',
+        padding: 12,
+        borderRadius: 16
+    },
+    modalTXT: {
+        fontFamily: fonts.IntMed,
+        textAlign: 'center',
+        fontSize: 16
+    },
+    uploadImgCard:{
+        backgroundColor: '#FAFAFA',
+        borderRadius: 10,
+        borderWidth: 3,
+        borderStyle: 'dashed',
+        borderColor: '#E3E3E3',
+        alignItems: 'center',
+        paddingVertical: 22,
+        marginTop: 16
+    }
 })
 
 export default UploadClassImage;

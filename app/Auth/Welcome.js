@@ -1,11 +1,11 @@
 import { router } from "expo-router"
 import React from 'react'
-import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { colors, fonts } from '../../config/Config'
 
 
-const Welcome = ({ navigation }) => {
+const Welcome = () => {
   const inset = useSafeAreaInsets()
   return (
     <View style={styles.container}>
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
   },
   BGImg: {
     width: '100%',
-    height: Dimensions.get('window').height,
+    // height: Dimensions.get('window').height,
+    flex: 1,
     justifyContent: 'flex-end'
   },
   heading: {
