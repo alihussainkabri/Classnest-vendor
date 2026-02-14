@@ -2,14 +2,16 @@ import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
 
 
 const ReviewDetails = () => {
     const inset = useSafeAreaInsets()
+    const {user} = useContext(userContext)
 
     const { accountType, name, skill } = useLocalSearchParams()
 
@@ -45,7 +47,7 @@ const ReviewDetails = () => {
                         isRequired
                         style={{ height: 42, marginTop: 12 }}
                     >
-                        <InputField value={name} placeholder="e.g John Doe" style={{ backgroundColor: '#C6C9D2', color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                        <InputField value={user?.person_name} placeholder="e.g John Doe" style={{ backgroundColor: '#C6C9D2', color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                     </Input>
 
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Selected categories</Text>

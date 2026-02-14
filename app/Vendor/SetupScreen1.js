@@ -2,17 +2,78 @@
 import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 
 const SetupScreen1 = () => {
   const inset = useSafeAreaInsets()
+  const [name, setName] = useState("")
+  const [accountType, setAccountType] = useState('Individual')
+  const { user, setUser } = useContext(userContext)
 
-  const [accountType, setAccountType] = useState('individual')
+  useEffect(() => {
+    if(user?.account_type){
+      setAccountType(user?.account_type)
+    }
+
+    if (user?.person_name){
+      setName(user?.person_name)
+    }
+  },[user])
+
+  async function submit() {
+    const formData = new FormData()
+
+    formData.append("person_name", name)
+    formData.append("account_type", accountType)
+
+    const response = await fetch(url + "vendor-onboarding/step-1", {
+      method: 'POST',
+      headers: {
+        "Authorization": `Bearer ${user?.token}`
+      },
+      body: formData
+    })
+
+    if (response.ok == true) {
+      const data = await response.json()
+
+      if (data.status == 200) {
+        setUser(data?.user_data)
+        AsyncStorage.setItem("classnest_vendor", JSON.stringify(data?.user_data))
+        Toast.success(data?.message)
+
+        if (accountType == "Individual") {
+          setTimeout(() => {
+            router.push({
+              pathname: 'Vendor/SelectCourses',
+              params: { accountType, name }
+            })
+          }, 200);
+        } else {
+          setTimeout(() => {
+            router.push({
+              pathname: 'Vendor/SetupScreen2',
+              params: { accountType },
+            })
+          }, 200);
+        }
+
+
+
+      } else {
+        Toast.error(data?.message)
+      }
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -36,28 +97,33 @@ const SetupScreen1 = () => {
             isInvalid={false}
             isRequired
             style={{ height: 42, marginTop: 12 }}
+
           >
-            <InputField placeholder="e.g John Doe" style={{ color: 'red', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+            <InputField value={name}
+              onChangeText={e => setName(e)} placeholder="e.g John Doe" style={{ color: 'red', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
           </Input>
 
           <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Account Type</Text>
           <HStack space="md" style={{ marginTop: 12 }}>
-            <TouchableOpacity onPress={() => setAccountType('individual')} style={[styles.AccBTN, { backgroundColor: accountType == 'individual' ? colors.primary : "#F1F2F4" }]}>
-              <Text style={[styles.BTNtext, { color: accountType == 'individual' ? 'white' : "#666D80" }]}>Individual Tutor</Text>
+            <TouchableOpacity onPress={() => setAccountType('Individual')} style={[styles.AccBTN, { backgroundColor: accountType == 'Individual' ? colors.primary : "#F1F2F4" }]}>
+              <Text style={[styles.BTNtext, { color: accountType == 'Individual' ? 'white' : "#666D80" }]}>Individual Tutor</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setAccountType('business')} style={[styles.AccBTN, { backgroundColor: accountType == 'business' ? colors.primary : "#F1F2F4" }]}>
-              <Text style={[styles.BTNtext, { color: accountType == 'business' ? 'white' : "#666D80" }]}>Institute / Business</Text>
+            <TouchableOpacity onPress={() => setAccountType('Business')} style={[styles.AccBTN, { backgroundColor: accountType == 'Business' ? colors.primary : "#F1F2F4" }]}>
+              <Text style={[styles.BTNtext, { color: accountType == 'Business' ? 'white' : "#666D80" }]}>Institute / Business</Text>
             </TouchableOpacity>
           </HStack>
 
         </View>
 
         <View style={{ alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => router.push({
-            pathname: 'Vendor/SetupScreen2',
-            params: { accountType },
-          })} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+          <TouchableOpacity onPress={() => {
+            if (name && accountType) {
+              submit()
+            } else {
+              Toast.error("Please fill all details")
+            }
+          }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
             <Text style={styles.WhiteBTNText}>Next : Add Class Details</Text>
           </TouchableOpacity>
         </View>

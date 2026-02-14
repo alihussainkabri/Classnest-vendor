@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from "expo-router"
-import React from 'react'
+import { useContext } from 'react'
 import { Dimensions, Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { colors, fonts } from '../../config/Config'
+import { userContext } from '../../context/UserContext'
 
 const DetailSuccess = () => {
     const inset = useSafeAreaInsets()
+    const {user} = useContext(userContext)
 
     return (
         <View style={styles.container}>
@@ -18,7 +20,7 @@ const DetailSuccess = () => {
                     </TouchableOpacity>
 
                     <Image source={require('../../assets/images/verified.png')} style={{ width: '100%', height: 250, resizeMode: 'contain', marginTop: 64 }} />
-                    <Text style={{ fontFamily: fonts.IntSB, fontSize: 24, textAlign: 'center', color: 'white', marginTop: -16 }}>You’re all set, ABC Music Academy!</Text>
+                    <Text style={{ fontFamily: fonts.IntSB, fontSize: 24, textAlign: 'center', color: 'white', marginTop: -16 }}>You’re all set, {user?.institute_name}!</Text>
                     <Text style={{ fontFamily: fonts.IntSB, fontSize: 14, paddingHorizontal: 26, textAlign: 'center', color: 'white', marginTop: 16 }}>Your categories are saved. Let’s list your first class.</Text>
                 </View>
 

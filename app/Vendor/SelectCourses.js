@@ -1,43 +1,37 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, FlatList, Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { node_url, url } from '../../helpers';
 
 
 const SelectCourses = () => {
     const inset = useSafeAreaInsets()
     const [selected, setSelected] = useState([]);
     const { accountType, name } = useLocalSearchParams()
-
-    const SKILLS = [
-        { id: '1', title: 'Art' },
-        { id: '2', title: 'Coding' },
-        { id: '3', title: 'Robotics' },
-        { id: '4', title: 'Dance' },
-        { id: '5', title: 'Music' },
-        { id: '6', title: 'Fitness' },
-        { id: '7', title: 'Academic' },
-        { id: '8', title: 'Yoga' },
-        { id: '9', title: 'Writing' },
-        { id: '10', title: 'fitting' },
-        { id: '12', title: 'sitting' },
-        { id: '13', title: 'hitting' },
-        { id: '14', title: 'bitting' },
-    ];
+    const { user,setUser } = useContext(userContext)
+    const [skills, setSkills] = useState([])
 
     const toggleSkill = (item) => {
-        setSelected((prev) =>
-            prev.filter(selector => selector?.id == item?.id).length > 0
+        setSelected((prev) => prev.includes(item?.id)
                 ? prev.filter((i) => i.id !== item?.id)
-                : [...prev, item]
+                : [...prev, item?.id]
         );
-        console.log(selected)
     };
 
+    useEffect(() => {
+        if (user?.categories){
+            setSelected(JSON.parse(user?.categories))
+        }
+    } , [user])
+
     const renderItem = ({ item }) => {
-        const isSelected = selected.filter(prev => prev?.id == item.id).length > 0 ? true : false
+        const isSelected = selected.includes(item.id) ? true : false
 
         return (
             <TouchableOpacity
@@ -47,18 +41,72 @@ const SelectCourses = () => {
                 ]}
                 onPress={() => toggleSkill(item)}
             >
-                <Image style={[styles.icon, { tintColor: 'white' }]} source={require('../../assets/images/code-icon.png')} />
+                <Image style={[styles.icon, { tintColor: 'black' }]} source={{ uri: `${node_url}${item?.image}` }} />
                 <Text
                     style={[
                         styles.skillText,
                         isSelected && styles.skillTextSelected,
                     ]}
                 >
-                    {item.title}
+                    {item?.name}
                 </Text>
             </TouchableOpacity>
         );
     };
+
+    async function fetchCategories() {
+        const response = await fetch(url + "fetch-categories?status=1", {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            if (data?.status == 200) {
+                setSkills(data?.list)
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories()
+    }, [])
+
+    async function submit() {
+        const formData = new FormData()
+
+        formData.append("categories_id", JSON.stringify(selected))
+
+        const response = await fetch(url + "vendor-onboarding/add-categories", {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            },
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data.status == 200) {
+                setUser(data?.user_data)
+                AsyncStorage.setItem("classnest_vendor", JSON.stringify(data?.user_data))
+                Toast.success(data?.message)
+
+                
+                    setTimeout(() => {
+                        router.push('Vendor/DetailSuccess')
+                    }, 200);
+                
+
+
+
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -75,7 +123,7 @@ const SelectCourses = () => {
 
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <FlatList
-                    data={SKILLS}
+                    data={skills}
                     keyExtractor={(item) => item.id}
                     numColumns={3}
                     renderItem={renderItem}
@@ -85,14 +133,14 @@ const SelectCourses = () => {
 
                 <View style={{ alignItems: 'center' }}>
                     <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, marginTop: 6 }}>Select at least 3 categories to continue</Text>
-                    <TouchableOpacity onPress={() => router.push({
-                        pathname: 'Vendor/ReviewDetails',
-                        params: {
-                            accountType,
-                            name,
-                            skill: JSON.stringify(selected)
+                    <TouchableOpacity onPress={() => {
+                        
+                        if (selected.length > 2) {
+                            submit()
+                        } else {
+                            Toast.error("Please select atleast 3 categories")
                         }
-                    })} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Next</Text>
                     </TouchableOpacity>
                 </View>
