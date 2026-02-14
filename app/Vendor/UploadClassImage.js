@@ -95,19 +95,14 @@ const UploadClassImage = ({ navigation }) => {
                 <View style={{ marginHorizontal: 16, }}>
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
 
-                    <TouchableOpacity>
-                        <View style={{flexDirection :'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF' }}>
+                    <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
+                        <View style={{flexDirection :'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
                             <Feather name="upload" size={24} color="#002858" />
-                            <Text style={{fontFamily: fonts.IntSB, color: '#17181C', fontSize: 14}}>Upload</Text>
+                            <Text style={{fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8}}>Upload</Text>
                         </View>
 
-                        <Text style={{ fontFamily: fonts.IntReg, fontSize: 12, color: '#17181C' }}>Tap to upload images</Text>
-                        <Text style={{ fontFamily: fonts.IntMed, fontSize: 12, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
-                    </TouchableOpacity>
-
-
-                    <TouchableOpacity onPress={() => setShowModal(true)}>
-                        <Text>UPLOAD</Text>
+                        <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
+                        <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
                     </TouchableOpacity>
 
                     {image && (
@@ -193,6 +188,16 @@ const styles = StyleSheet.create({
         fontFamily: fonts.IntMed,
         textAlign: 'center',
         fontSize: 16
+    },
+    uploadImgCard:{
+        backgroundColor: '#FAFAFA',
+        borderRadius: 10,
+        borderWidth: 3,
+        borderStyle: 'dashed',
+        borderColor: '#E3E3E3',
+        alignItems: 'center',
+        paddingVertical: 22,
+        marginTop: 16
     }
 })
 
