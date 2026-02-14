@@ -37,7 +37,7 @@ const ListingClass1 = () => {
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
                     <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Let’s List Your First Class</Text>
-                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Confirm your information before listing your classes.</Text>
+                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
                 </View>
             </ImageBackground>
 

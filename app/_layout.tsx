@@ -22,7 +22,8 @@ export default function RootLayout() {
         <Stack screenOptions={{
           headerShown: false
         }}>
-          <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
+          <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} />
+          <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} />
           <Stack.Screen name="Auth/Welcome" options={{ presentation: 'modal', title: 'yes' }} />
           <Stack.Screen name="Auth/Login" options={{ presentation: 'modal', title: 'yes' }} />
           <Stack.Screen name="Auth/Verification" options={{ presentation: 'modal', title: 'yes' }} />
@@ -36,7 +37,9 @@ export default function RootLayout() {
 
           <Stack.Screen name="Vendor/ListingClass1" options={{ presentation: 'modal', title: 'yes' }} />
           <Stack.Screen name="Vendor/ListingClass2" options={{ presentation: 'modal', title: 'yes' }} />
-          {/* <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} /> */}
+          <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
+          {/* <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} /> */}
+          {/* <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} /> */}
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
