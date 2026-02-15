@@ -25,7 +25,7 @@ import { url } from '../../helpers';
 
 const ListingClass1 = () => {
     const inset = useSafeAreaInsets()
-    const {class_id} = useLocalSearchParams()
+    const {class_id,class_details} = useLocalSearchParams()
     const { user } = useContext(userContext)
     const [skills, setSkills] = useState([])
 
@@ -52,6 +52,14 @@ const ListingClass1 = () => {
 
     useEffect(() => {
         fetchCategories()
+
+        if (class_details){
+            let class_data = JSON.parse(class_details)
+            setClassName(class_data?.display_name)
+            setClassCategory(class_data?.categories)
+            setDescription(class_data?.description)
+            setStartYear(class_data?.started_year)
+        }
     }, [])
 
     async function submit() {
