@@ -53,20 +53,20 @@ export default function RootLayout() {
 
                 setTimeout(() => {
                   router.push({
-                    pathname : 'Vendor/ProfileStatus',
-                    params : {
+                    pathname: 'Vendor/ProfileStatus',
+                    params: {
                       percentage,
-                      list : JSON.stringify(data?.list)
+                      list: JSON.stringify(data?.list)
                     }
                   });
                 }, 0);
               } else {
                 setTimeout(() => {
                   router.push({
-                    pathname : 'Vendor/ProfileStatus',
-                    params : {
-                      percentage : 0,
-                      list : JSON.stringify([])
+                    pathname: 'Vendor/ProfileStatus',
+                    params: {
+                      percentage: 0,
+                      list: JSON.stringify([])
                     }
                   });
                 }, 0);
@@ -93,6 +93,9 @@ export default function RootLayout() {
             <Stack screenOptions={{
               headerShown: false
             }}>
+
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
               <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Auth/Welcome" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Auth/Login" options={{ presentation: 'modal', title: 'yes' }} />
