@@ -40,13 +40,13 @@ const ListingClass3 = () => {
     const [pickerType, setPickerType] = useState(null);
     const [visible, setVisible] = useState(false);
     const [showActionsheet, setShowActionsheet] = useState(false);
-    const [editBatchID,setEditBatchID] = useState("")
+    const [editBatchID, setEditBatchID] = useState("")
     const [selectedDay, setSelectedDay] = useState('');
     const [totalBatches, setTotalBatches] = useState([])
 
     const handleClose = () => {
         setShowActionsheet(false)
-    setEditBatchID("")
+        setEditBatchID("")
     };
 
     const openPicker = (type) => {
@@ -116,12 +116,12 @@ const ListingClass3 = () => {
     }, [])
 
     useEffect(() => {
-        if (editBatchID?.id){
+        if (editBatchID?.id) {
             setSelectedDay(editBatchID?.day)
             setStartTime(new Date(editBatchID?.start_time))
             setEndTime(new Date(editBatchID?.end_time))
         }
-    },[editBatchID])
+    }, [editBatchID])
 
     async function create() {
         const formData = new FormData()
@@ -129,7 +129,13 @@ const ListingClass3 = () => {
         formData.append("start_time", startTime?.toString())
         formData.append("end_time", endTime?.toString())
 
-        const response = await fetch(url + "create-batch/" + class_id, {
+        let api_url = url + "create-batch/" + class_id
+
+        if (editBatchID?.id) {
+            api_url = url + "edit-batch/" + editBatchID?.id
+        }
+
+        const response = await fetch(api_url, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${user?.token}`
@@ -142,13 +148,38 @@ const ListingClass3 = () => {
             console.log(data)
 
             if (data?.status == 200) {
-                Toast.success("Batch created successfully")
+                if (editBatchID?.id) {
+                    Toast.success("Batch edited successfully")
+                } else {
+
+                    Toast.success("Batch created successfully")
+                }
                 fetchBatches()
                 handleClose()
             } else {
                 Toast.error(data?.message)
             }
 
+        }
+    }
+
+    async function deleteBatch() {
+        const response = await fetch(url + "delete-batch/" + editBatchID?.id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data.status == 200) {
+                Toast.success("Batch deleted successfully")
+                fetchBatches()
+                handleClose()
+            } else {
+                Toast.error(data?.message)
+            }
         }
     }
 
@@ -179,7 +210,7 @@ const ListingClass3 = () => {
                             {totalBatches.length > 0 && totalBatches?.map((item, index) => (
                                 <TouchableOpacity onPress={() => {
                                     setTimeout(() => {
-                                       setShowActionsheet(true) 
+                                        setShowActionsheet(true)
                                     }, 500);
                                     setEditBatchID(item)
                                 }} key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
@@ -188,7 +219,7 @@ const ListingClass3 = () => {
                                             <Ionicons name="calendar-clear-sharp" size={32} color="#9DA2A6" />
                                             <Text style={{ color: '#666D80', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 12 }}>{item?.day}</Text>
                                         </HStack>
-                                        <Text style={{ color: '#666D80', textTransform : 'uppercase',fontFamily: fonts.IntMed, fontSize: 14 }}>{new Date(item?.start_time).toLocaleTimeString([], {
+                                        <Text style={{ color: '#666D80', textTransform: 'uppercase', fontFamily: fonts.IntMed, fontSize: 14 }}>{new Date(item?.start_time).toLocaleTimeString([], {
                                             hour: "numeric",
                                             minute: "2-digit",
                                             hour12: true,
@@ -212,8 +243,8 @@ const ListingClass3 = () => {
 
                     <View style={{ alignItems: 'center' }}>
                         <TouchableOpacity onPress={() => router.push({
-                            pathname : 'Vendor/InstructorsList',
-                            params : {
+                            pathname: 'Vendor/InstructorsList',
+                            params: {
                                 class_id
                             }
                         })} activeOpacity={.8} style={[styles.whiteBTN]}>
@@ -235,7 +266,18 @@ const ListingClass3 = () => {
                                     </ActionsheetDragIndicatorWrapper> */}
                             <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginTop: 12, }}>Batch</Text>
                             <HStack style={{ justifyContent: 'space-between', width: '100%', marginTop: -18 }}>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => {
+                                    Alert.alert("Delete","Are you sure you want to delete batch",[
+                                        {
+                                            text : 'Cancel',
+                                            onPress : () => null
+                                        },
+                                        {
+                                            text : 'Delete',
+                                            onPress : () => deleteBatch()
+                                        }
+                                    ])
+                                }}>
                                     {editBatchID?.id && <Text style={{ color: '#FF0004', fontFamily: fonts.IntMed, fontSize: 11 }}>Delete</Text>}
                                 </TouchableOpacity>
 
