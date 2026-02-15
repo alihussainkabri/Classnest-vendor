@@ -25,15 +25,12 @@ const InstructorsList = () => {
 
         if (response.ok == true) {
             const data = await response.json()
-            console.log(data)
             setInstructorsList(data?.list)
         }
     }
 
     useEffect(() => {
         fetchInstructors()
-
-        console.log("class_id",class_id)
     }, [])
 
 
@@ -60,7 +57,8 @@ const InstructorsList = () => {
                                 <TouchableOpacity onPress={() => router.push({
                                     pathname: 'Vendor/AddInstructors',
                                     params: {
-                                        class_id : class_id
+                                        class_id : class_id,
+                                        previous_data : JSON.stringify({})
                                     }
                                 })} style={{ backgroundColor: '#16A34A', paddingHorizontal: 6, paddingBottom: 4, borderRadius: 4 }}>
                                     <Text style={{ fontFamily: fonts.IntBold, fontSize: 12, color: 'white' }}><Text style={{ fontSize: 18 }}>+ </Text> Add Instructor</Text>
@@ -68,7 +66,15 @@ const InstructorsList = () => {
                             </HStack>
 
                             {instructorsList?.length > 0 ? instructorsList?.map((item, index) => (
-                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+                                <TouchableOpacity key={index} onPress={() => {
+                                    router.push({
+                                    pathname: 'Vendor/AddInstructors',
+                                    params: {
+                                        class_id : class_id,
+                                        previous_data : JSON.stringify(item)
+                                    }
+                                })
+                                }} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
                                     <HStack alignItems="center" style={{ justifyContent: 'space-between', flex: 1, borderWidth: 1.5, borderColor: '#CDCECF', paddingVertical: 14, paddingHorizontal: 16, borderTopLeftRadius: 6, borderBottomLeftRadius: 6, borderRightWidth: 0 }}>
                                         <HStack alignItems="center">
                                             <Text style={{ color: '#666D80', fontFamily: fonts.IntMed, fontSize: 16 }}>{item?.name}</Text>
