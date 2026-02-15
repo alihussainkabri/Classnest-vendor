@@ -16,7 +16,7 @@ import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, Style
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
 
-const UploadAwards = ({ navigation }) => {
+const UploadCertificate = ({ navigation }) => {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [image, setImage] = useState(null);
@@ -84,15 +84,15 @@ const UploadAwards = ({ navigation }) => {
                     <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
-                    <Text style={{ marginTop: 16, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 8 }}>Upload Awards</Text>
-                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Add awards to build trust with parents and students</Text>
+                    <Text style={{ marginTop: 16, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 8 }}>Upload Certificate</Text>
+                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Add teaching or professional certificates to build credibility</Text>
                 </View>
             </ImageBackground>
 
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View style={{ marginHorizontal: 16, }}>
-                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Award Title</Text>
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Certificate Title</Text>
                         <Input
                             variant="none"
                             size="lg"
@@ -111,10 +111,10 @@ const UploadAwards = ({ navigation }) => {
                             style={{ width: '100%', borderWidth: 0, marginTop: 12, color: "#666D80" }}
                         >
                             <TextareaInput value={description}
-                                onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="Who issued this award and when?" />
+                                onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="Issuing organization and year" />
                         </Textarea>
 
-                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Award Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Certificate Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
 
                         <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
                             <View style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
@@ -122,7 +122,7 @@ const UploadAwards = ({ navigation }) => {
                                 <Text style={{ fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8 }}>Upload</Text>
                             </View>
 
-                            <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload award images</Text>
+                            <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload Certificate images</Text>
                             <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
                         </TouchableOpacity>
 
@@ -162,7 +162,7 @@ const UploadAwards = ({ navigation }) => {
                 <View style={{ alignItems: 'center' }}>
                     <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
 
-                    <TouchableOpacity onPress={() => router.push('Vendor/UploadCertificate')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => router.push('Vendor/ProfileStatus')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>
@@ -246,4 +246,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default UploadAwards;
+export default UploadCertificate;

@@ -76,7 +76,7 @@ const ProfileStatus = ({ navigation }) => {
                 <View style={{ alignItems: 'center' }}>
                     <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
 
-                    <TouchableOpacity onPress={() => router.push('Vendor/ReceiveEnquiries')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => router.push('Vendor/UploadAwards')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>
