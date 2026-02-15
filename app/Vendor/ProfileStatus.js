@@ -79,7 +79,7 @@ const ProfileStatus = ({ navigation }) => {
                         </HStack>
 
                         {list?.length > 0 && list?.map((item, index) => (
-                            <TouchableOpacity onPress={() => } key={index}>
+                            <TouchableOpacity onPress={() => handleRedirection(item)} key={index}>
                                 <View style={styles.QueCard}>
                                     {item?.result == 'passed' ? <Text style={styles.tickIcon}>✔</Text> : <MaterialCommunityIcons name="clock" size={30} color="#FFCF1F" />}
 
