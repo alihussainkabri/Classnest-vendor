@@ -20,25 +20,34 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { format, isAfter } from 'date-fns';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useState } from 'react';
 import { Alert, Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 
 const ListingClass3 = () => {
     const inset = useSafeAreaInsets()
+    const { user } = useContext(userContext)
+    const { class_id } = useLocalSearchParams()
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
     const [pickerType, setPickerType] = useState(null);
     const [visible, setVisible] = useState(false);
     const [showActionsheet, setShowActionsheet] = useState(false);
+    const [editBatchID, setEditBatchID] = useState("")
     const [selectedDay, setSelectedDay] = useState('');
     const [totalBatches, setTotalBatches] = useState([])
 
-    const handleClose = () => setShowActionsheet(false);
+    const handleClose = () => {
+        setShowActionsheet(false)
+        setEditBatchID("")
+    };
 
     const openPicker = (type) => {
         setPickerType(type);
@@ -72,21 +81,95 @@ const ListingClass3 = () => {
 
             setEndTime(date);
             setPickerType(null);
-            // console.log('start', format(startTime, 'hh:mm a'))
-            // console.log('end', format(endTime, 'hh:mm a'))
+            
             console.log('selected day: ', selectedDay)
         }
     };
+    async function fetchBatches() {
+        const response = await fetch(url + "fetchClassWiseBatch/" + class_id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
 
-    // function updateBatches() {
-    //     if (selectedDay, startTime, endTime) {
-    //         setTotalBatches((prev) =>
-    //             prev.includes(item)
-    //                 ? prev.filter((i) => i !== item)
-    //                 : [...prev, item]
-    //         );
-    //     }
-    // }
+        if (response.ok == true) {
+            const data = await response.json()
+            console.log(data)
+            setTotalBatches(data?.list)
+        }
+    }
+
+    useEffect(() => {
+        fetchBatches()
+    }, [])
+
+    useEffect(() => {
+        if (editBatchID?.id) {
+            setSelectedDay(editBatchID?.day)
+            setStartTime(new Date(editBatchID?.start_time))
+            setEndTime(new Date(editBatchID?.end_time))
+        }
+    }, [editBatchID])
+
+    async function create() {
+        const formData = new FormData()
+        formData.append("day", selectedDay)
+        formData.append("start_time", startTime?.toString())
+        formData.append("end_time", endTime?.toString())
+
+        let api_url = url + "create-batch/" + class_id
+
+        if (editBatchID?.id) {
+            api_url = url + "edit-batch/" + editBatchID?.id
+        }
+
+        const response = await fetch(api_url, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            },
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            console.log(data)
+
+            if (data?.status == 200) {
+                if (editBatchID?.id) {
+                    Toast.success("Batch edited successfully")
+                } else {
+
+                    Toast.success("Batch created successfully")
+                }
+                fetchBatches()
+                handleClose()
+            } else {
+                Toast.error(data?.message)
+            }
+
+        }
+    }
+
+    async function deleteBatch() {
+        const response = await fetch(url + "delete-batch/" + editBatchID?.id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data.status == 200) {
+                Toast.success("Batch deleted successfully")
+                fetchBatches()
+                handleClose()
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
@@ -112,108 +195,152 @@ const ListingClass3 = () => {
                                 </TouchableOpacity>
                             </HStack>
 
-                            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
-                                <HStack alignItems="center" style={{ justifyContent: 'space-between', flex: 1, borderWidth: 1.5, borderColor: '#CDCECF', paddingVertical: 14, paddingHorizontal: 16, borderTopLeftRadius: 6, borderBottomLeftRadius: 6, borderRightWidth: 0 }}>
-                                    <HStack alignItems="center">
-                                        <Ionicons name="calendar-clear-sharp" size={32} color="#9DA2A6" />
-                                        <Text style={{ color: '#666D80', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 12 }}>Monday</Text>
-                                    </HStack>
-                                    <Text style={{ color: '#666D80', fontFamily: fonts.IntMed, fontSize: 14 }}>10:30 AM - 11:30 AM</Text>
-                                </HStack>
-                                <View style={{ backgroundColor: colors.primary, alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 6, borderBottomRightRadius: 6, }}>
-                                    <Entypo name="chevron-thin-right" size={24} color="white" />
-                                </View>
-                            </TouchableOpacity>
-
-                            <Actionsheet
-                                isOpen={showActionsheet}
-                                onClose={handleClose}
-                            >
-                                <ActionsheetBackdrop />
-                                <ActionsheetContent style={{ backgroundColor: 'white' }}>
-                                    {/* <ActionsheetDragIndicatorWrapper>
-                                        <ActionsheetDragIndicator />
-                                    </ActionsheetDragIndicatorWrapper> */}
-                                    <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginTop: 12, }}>Batch</Text>
-                                    <HStack style={{ justifyContent: 'space-between', width: '100%', marginTop: -18 }}>
-                                        <TouchableOpacity>
-                                            <Text style={{ color: '#FF0004', fontFamily: fonts.IntMed, fontSize: 11 }}>Delete</Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity onPress={() => handleClose()}>
-                                            <Text style={{ color: '#9DA2A6', fontFamily: fonts.IntMed, fontSize: 11 }}>Cancel</Text>
-                                        </TouchableOpacity>
-                                    </HStack>
-
-                                    <View style={{ width: '100%' }}>
-                                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 30 }}>Day</Text>
-                                        <Select selectedValue={selectedDay} onValueChange={(value) => setSelectedDay(value)} style={{ marginTop: 10, }}>
-                                            <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                                                <SelectInput placeholder="Select Day" fontFamily={fonts.IntSB} fontSize={13} style={{ color: '#666D80' }} />
-                                                <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
-                                            </SelectTrigger>
-                                            <SelectPortal>
-                                                <SelectBackdrop />
-                                                <SelectContent>
-                                                    <SelectDragIndicatorWrapper>
-                                                        <SelectDragIndicator />
-                                                    </SelectDragIndicatorWrapper>
-                                                    {[
-                                                        'Monday',
-                                                        'Tuesday',
-                                                        'Wednesday',
-                                                        'Thursday',
-                                                        'Friday',
-                                                        'Saturday',
-                                                        'Sunday',
-                                                    ].map(day => (
-                                                        <SelectItem key={day} label={day} value={day} />
-                                                    ))}
-                                                </SelectContent>
-                                            </SelectPortal>
-                                        </Select>
-
-                                        <HStack space="md" style={{ marginTop: 16 }}>
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Start Time</Text>
-                                                <TouchableOpacity onPress={() => openPicker('start')} style={styles.TimeSelectBtn}>
-                                                    <Text style={styles.TimeSelectText}>{startTime ? format(startTime, 'hh:mm a') : 'Select'}</Text>
-                                                    <MaterialCommunityIcons name="clock" size={22} color="#666D80" />
-                                                </TouchableOpacity>
-                                            </View>
-
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>End Time</Text>
-                                                <TouchableOpacity onPress={() => openPicker('end')} style={styles.TimeSelectBtn}>
-                                                    <Text style={styles.TimeSelectText}>{endTime ? format(endTime, 'hh:mm a') : 'Select'}</Text>
-                                                    <MaterialCommunityIcons name="clock" size={22} color="#666D80" />
-                                                </TouchableOpacity>
-                                            </View>
+                            {totalBatches.length > 0 && totalBatches?.map((item, index) => (
+                                <TouchableOpacity onPress={() => {
+                                    setTimeout(() => {
+                                        setShowActionsheet(true)
+                                    }, 500);
+                                    setEditBatchID(item)
+                                }} key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
+                                    <HStack alignItems="center" style={{ justifyContent: 'space-between', flex: 1, borderWidth: 1.5, borderColor: '#CDCECF', paddingVertical: 14, paddingHorizontal: 16, borderTopLeftRadius: 6, borderBottomLeftRadius: 6, borderRightWidth: 0 }}>
+                                        <HStack alignItems="center">
+                                            <Ionicons name="calendar-clear-sharp" size={32} color="#9DA2A6" />
+                                            <Text style={{ color: '#666D80', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 12 }}>{item?.day}</Text>
                                         </HStack>
-
-                                        <TouchableOpacity style={styles.ActionBtn}>
-                                            <Text style={styles.WhiteBTNText}>Add</Text>
-                                        </TouchableOpacity>
-
+                                        <Text style={{ color: '#666D80', textTransform: 'uppercase', fontFamily: fonts.IntMed, fontSize: 14 }}>{new Date(item?.start_time).toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })} - {new Date(item?.end_time).toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                        })}</Text>
+                                    </HStack>
+                                    <View style={{ backgroundColor: colors.primary, alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', borderTopRightRadius: 6, borderBottomRightRadius: 6, }}>
+                                        <Entypo name="chevron-thin-right" size={24} color="white" />
                                     </View>
-                                </ActionsheetContent>
-                            </Actionsheet>
+                                </TouchableOpacity>
+                            ))}
 
-                            <DateTimePickerModal
-                                isVisible={visible}
-                                mode="time"
-                                onConfirm={onConfirm}
-                                onCancel={() => setVisible(false)}
-                            />
+
+
 
                         </View>
                     </ScrollView>
 
                     <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => router.push('Vendor/InstructorsList')} activeOpacity={.8} style={[styles.whiteBTN]}>
+                        <TouchableOpacity onPress={() => router.push({
+                            pathname: 'Vendor/InstructorsList',
+                            params: {
+                                class_id
+                            }
+                        })} activeOpacity={.8} style={[styles.whiteBTN]}>
                             <Text style={styles.WhiteBTNText}>Continue</Text>
                         </TouchableOpacity>
                     </View>
+
+
+
+                    {/* batch creation start here */}
+                    <Actionsheet
+                        isOpen={showActionsheet}
+                        onClose={handleClose}
+                    >
+                        <ActionsheetBackdrop />
+                        <ActionsheetContent style={{ backgroundColor: 'white' }}>
+                            {/* <ActionsheetDragIndicatorWrapper>
+                                        <ActionsheetDragIndicator />
+                                    </ActionsheetDragIndicatorWrapper> */}
+                            <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginTop: 12, }}>Batch</Text>
+                            <HStack style={{ justifyContent: 'space-between', width: '100%', marginTop: -18 }}>
+                                <TouchableOpacity onPress={() => {
+                                    Alert.alert("Delete","Are you sure you want to delete batch",[
+                                        {
+                                            text : 'Cancel',
+                                            onPress : () => null
+                                        },
+                                        {
+                                            text : 'Delete',
+                                            onPress : () => deleteBatch()
+                                        }
+                                    ])
+                                }}>
+                                    {editBatchID?.id && <Text style={{ color: '#FF0004', fontFamily: fonts.IntMed, fontSize: 11 }}>Delete</Text>}
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => handleClose()}>
+                                    <Text style={{ color: '#9DA2A6', fontFamily: fonts.IntMed, fontSize: 11 }}>Cancel</Text>
+                                </TouchableOpacity>
+                            </HStack>
+
+                            <View style={{ width: '100%' }}>
+                                <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 30 }}>Day</Text>
+                                <Select selectedValue={selectedDay} onValueChange={(value) => setSelectedDay(value)} style={{ marginTop: 10, }}>
+                                    <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
+                                        <SelectInput placeholder="Select Day" fontFamily={fonts.IntSB} fontSize={13} style={{ color: '#666D80' }} />
+                                        <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
+                                    </SelectTrigger>
+                                    <SelectPortal>
+                                        <SelectBackdrop />
+                                        <SelectContent>
+                                            <SelectDragIndicatorWrapper>
+                                                <SelectDragIndicator />
+                                            </SelectDragIndicatorWrapper>
+                                            {[
+                                                'Monday',
+                                                'Tuesday',
+                                                'Wednesday',
+                                                'Thursday',
+                                                'Friday',
+                                                'Saturday',
+                                                'Sunday',
+                                            ].map(day => (
+                                                <SelectItem key={day} label={day} value={day} />
+                                            ))}
+                                        </SelectContent>
+                                    </SelectPortal>
+                                </Select>
+
+                                <HStack space="md" style={{ marginTop: 16 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Start Time</Text>
+                                        <TouchableOpacity onPress={() => openPicker('start')} style={styles.TimeSelectBtn}>
+                                            <Text style={styles.TimeSelectText}>{startTime ? format(startTime, 'hh:mm a') : 'Select'}</Text>
+                                            <MaterialCommunityIcons name="clock" size={22} color="#666D80" />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>End Time</Text>
+                                        <TouchableOpacity onPress={() => openPicker('end')} style={styles.TimeSelectBtn}>
+                                            <Text style={styles.TimeSelectText}>{endTime ? format(endTime, 'hh:mm a') : 'Select'}</Text>
+                                            <MaterialCommunityIcons name="clock" size={22} color="#666D80" />
+                                        </TouchableOpacity>
+                                    </View>
+                                </HStack>
+
+                                <TouchableOpacity onPress={() => {
+                                    if (selectedDay && startTime && endTime) {
+                                        create()
+                                    } else {
+                                        Toast.error("Please fill all details")
+                                    }
+                                }} style={styles.ActionBtn}>
+                                    <Text style={styles.WhiteBTNText}>Add</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </ActionsheetContent>
+                    </Actionsheet>
+
+                    <DateTimePickerModal
+                        isVisible={visible}
+                        mode="time"
+                        onConfirm={onConfirm}
+                        onCancel={() => setVisible(false)}
+                    />
+                    {/* batch creation end here */}
                 </View>
             </View>
         </KeyboardAvoidingView>

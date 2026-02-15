@@ -14,19 +14,80 @@ import { Textarea, TextareaInput } from '@/components/ui/textarea';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 
 const ListingClass1 = () => {
     const inset = useSafeAreaInsets()
+    const { user } = useContext(userContext)
+    const [skills, setSkills] = useState([])
 
     const [className, setClassName] = useState('')
     const [classCategory, setClassCategory] = useState('')
     const [description, setDescription] = useState('')
     const [startYear, setStartYear] = useState()
+
+
+    async function fetchCategories() {
+        const response = await fetch(url + "fetch-categories?status=1", {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            if (data?.status == 200) {
+                setSkills(data?.list)
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories()
+    }, [])
+
+    async function submit() {
+        const formData = new FormData()
+
+        formData.append("display_name", className)
+        formData.append("categories", classCategory)
+        formData.append("description", description)
+        formData.append("started_year", startYear)
+
+        const response = await fetch(url + "create-class", {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            },
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data.status == 200) {
+                console.log(data)
+                Toast.success("Class Created Successfully!")
+                setTimeout(() => {
+                    router.push({
+                        pathname : 'Vendor/ListingClass2',
+                        params : {
+                            class_id : data?.class_id
+                        }
+                    })
+                }, 300);
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -50,13 +111,14 @@ const ListingClass1 = () => {
                         isRequired
                         style={{ height: 42, marginTop: 12 }}
                     >
-                        <InputField value={className} onChangetext={setClassName} placeholder="e.g. Bharatanatyam Dance Classes" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                        <InputField value={className} onChangeText={setClassName} placeholder="e.g. Bharatanatyam Dance Classes" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                     </Input>
 
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Class category</Text>
-                    <Select style={{ marginTop: 12, }}>
+                    <Select selectedValue={classCategory}
+                        onValueChange={(value) => setClassCategory(value)} style={{ marginTop: 12, }}>
                         <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                            <SelectInput placeholder="Select Category" fontFamily={fonts.IntReg} fontSize={13} />
+                            <SelectInput value={skills.filter(item => item?.id == classCategory)[0]?.name} placeholder="Select Category" fontFamily={fonts.IntReg} fontSize={13} style={{color : "#666D80"}} />
                             <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
                         </SelectTrigger>
                         <SelectPortal>
@@ -65,14 +127,11 @@ const ListingClass1 = () => {
                                 <SelectDragIndicatorWrapper>
                                     <SelectDragIndicator />
                                 </SelectDragIndicatorWrapper>
-                                <SelectItem label="UX Research" value="ux" />
-                                <SelectItem label="Web Development" value="web" />
-                                <SelectItem
-                                    label="Cross Platform Development Process"
-                                    value="Cross Platform Development Process"
-                                />
-                                <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                                <SelectItem label="Backend Development" value="backend" />
+                                {skills.length > 0 && skills.map(skill => (
+                                    <SelectItem label={skill?.name} value={skill?.id} />
+                                ))}
+
+
                             </SelectContent>
                         </SelectPortal>
                     </Select>
@@ -83,38 +142,33 @@ const ListingClass1 = () => {
                         isReadOnly={false}
                         isInvalid={false}
                         isDisabled={false}
-                        style={{ width: '100%', borderWidth: 0, marginTop: 12 }}
+                        style={{ width: '100%', borderWidth: 0, marginTop: 12,color : "#666D80" }}
                     >
-                        <TextareaInput style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="What will students learn? Mention skills, levels, and outcomes." />
+                        <TextareaInput value={description}
+                            onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="What will students learn? Mention skills, levels, and outcomes." />
                     </Textarea>
 
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Started in</Text>
-                    <Select style={{ marginTop: 12, }}>
-                        <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                            <SelectInput placeholder="Select Year" fontFamily={fonts.IntReg} fontSize={13} />
-                            <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
-                        </SelectTrigger>
-                        <SelectPortal>
-                            <SelectBackdrop />
-                            <SelectContent>
-                                <SelectDragIndicatorWrapper>
-                                    <SelectDragIndicator />
-                                </SelectDragIndicatorWrapper>
-                                <SelectItem label="UX Research" value="ux" />
-                                <SelectItem label="Web Development" value="web" />
-                                <SelectItem
-                                    label="Cross Platform Development Process"
-                                    value="Cross Platform Development Process"
-                                />
-                                <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                                <SelectItem label="Backend Development" value="backend" />
-                            </SelectContent>
-                        </SelectPortal>
-                    </Select>
+
+                    <Input
+                        variant="none"
+                        size="lg"
+                        isRequired
+                        style={{ height: 42, marginTop: 12 }}
+                    >
+                        <InputField keyboardType="number-pad"
+                            value={startYear} onChangeText={setStartYear} placeholder="e.g. 1997" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                    </Input>
                 </View>
 
                 <View style={{ alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => router.push('Vendor/ListingClass2')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => {
+                        if (className && classCategory && description && startYear) {
+                            submit()
+                        } else {
+                            Toast.error("Please fill all details")
+                        }
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>

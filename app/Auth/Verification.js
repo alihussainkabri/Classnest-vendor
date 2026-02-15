@@ -94,10 +94,14 @@ const Verification = ({ navigation }) => {
                 AsyncStorage.setItem("classnest_vendor",JSON.stringify(data?.user_data))
                 Toast.success(data?.message)
 
-                if (newly_created == true){
+                
+
+                if (newly_created == "true"){
                     setTimeout(() => {
                        router.push('Auth/Success') 
                     }, 200);
+                }else{
+                    router.push("/Vendor/SetupScreen1");
                 }
             } else {
                 Toast.error(data?.message)
