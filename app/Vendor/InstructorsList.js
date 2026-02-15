@@ -2,27 +2,41 @@ import { HStack } from '@/components/ui/hstack';
 import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 
 const InstructorsList = () => {
     const inset = useSafeAreaInsets()
-    const { instructors } = useLocalSearchParams()
-
+    const {class_id} = useLocalSearchParams()
     const [instructorsList, setInstructorsList] = useState([])
+    const {user} = useContext(userContext)
+
+    async function fetchInstructors() {
+        const response = await fetch(url + "fetchClassWiseInstructor/" + class_id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            console.log(data)
+            setInstructorsList(data?.list)
+        }
+    }
 
     useEffect(() => {
-        const checkAvailableInstructor = instructors ? JSON.parse(instructors) : [];
+        fetchInstructors()
 
-        setInstructorsList(checkAvailableInstructor)
-
-        console.log('data: ', checkAvailableInstructor)
+        console.log("class_id",class_id)
     }, [])
 
-    console.log('check inst: ', instructorsList)
+
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
@@ -46,7 +60,7 @@ const InstructorsList = () => {
                                 <TouchableOpacity onPress={() => router.push({
                                     pathname: 'Vendor/AddInstructors',
                                     params: {
-                                        instructors: JSON.stringify(instructorsList),
+                                        class_id : class_id
                                     }
                                 })} style={{ backgroundColor: '#16A34A', paddingHorizontal: 6, paddingBottom: 4, borderRadius: 4 }}>
                                     <Text style={{ fontFamily: fonts.IntBold, fontSize: 12, color: 'white' }}><Text style={{ fontSize: 18 }}>+ </Text> Add Instructor</Text>

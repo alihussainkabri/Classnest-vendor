@@ -14,46 +14,56 @@ import {
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useState } from 'react';
+import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 const AddInstructors = () => {
     const inset = useSafeAreaInsets()
-    const { instructors } = useLocalSearchParams()
-    const instructorsParse = instructors ? JSON.parse(instructors) : [];
+    const { class_id } = useLocalSearchParams()
 
     const [name, setName] = useState('')
     const [gender, setGender] = useState('')
     const [age, setAge] = useState('')
     const [language, setLanguage] = useState('')
+    const {user} = useContext(userContext)
 
-    function addInstructor() {
+    async function addInstructor() {
         if (name && gender && age && language) {
-            const alreadyExist = instructorsParse.some((i) => i?.name && name && i?.name.toLowerCase() === name.toLowerCase())
+            const formData = new FormData()
+            formData.append("name",name)
+            formData.append("gender",gender)
+            formData.append("age",age)
+            formData.append("languages",language)
+            formData.append("class_ids",class_id)
+            formData.append("salary_min",'10,000')
+            formData.append("salary_max",'1,00,000')
 
-            if (alreadyExist) {
-                Alert.alert('Instructor already exists');
+            const response = await fetch(url + "create-instructor",{
+                method : 'POST',
+                headers : {
+                    "Authorization" : `Bearer ${user?.token}`
+                },
+                body : formData
+            })
 
-            } else {
-                const NewInstructor = {
-                    name: name,
-                    age: age,
-                    gender: gender,
-                    language: language,
+            if (response.ok == true){
+                const data = await response.json()
+                if (data?.status == 200){
+                    Toast.success(data?.message)
+                    setTimeout(() => {
+                       router.back() 
+                    }, 300);
+                }else{
+                    Toast.error(data?.message)
                 }
-
-                const updatedList = [...instructorsParse, NewInstructor];
-
-                router.push({
-                    pathname: 'Vendor/InstructorsList',
-                    params: { instructors: JSON.stringify(updatedList), },
-                })
             }
-
         } else {
-            Alert.alert('Fill all data')
+            Toast.error("Please fill all details")
         }
     }
 
@@ -74,14 +84,14 @@ const AddInstructors = () => {
                 <View style={{ flex: 1, }}>
                     <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                         <View style={{ marginHorizontal: 16, }}>
-                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Display name (Class name)</Text>
+                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Instructor Name</Text>
                             <Input
                                 variant="none"
                                 size="lg"
                                 isRequired
                                 style={{ height: 42, marginTop: 12 }}
                             >
-                                <InputField value={name} onChangeText={setName} placeholder="e.g. Bharatanatyam Dance Classes" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                <InputField value={name} onChangeText={setName} placeholder="e.g. John Doe" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                             </Input>
 
                             <HStack space="md" style={{ marginTop: 16 }}>
@@ -123,9 +133,9 @@ const AddInstructors = () => {
                             </HStack>
 
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Languages of instruction</Text>
-                            <Select selectedValue={language} onValueChange={(value) => setLanguage(value)} style={{ marginTop: 10, }}>
+                            <Select selectionMode="multiple" selectedValue={language} onValueChange={(value) => setLanguage(value)} style={{ marginTop: 10, }}>
                                 <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                                    <SelectInput placeholder="Select Day" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
+                                    <SelectInput placeholder="Select Language" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
                                     <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
                                 </SelectTrigger>
                                 <SelectPortal>
@@ -135,13 +145,9 @@ const AddInstructors = () => {
                                             <SelectDragIndicator />
                                         </SelectDragIndicatorWrapper>
                                         {[
-                                            'Monday',
-                                            'Tuesday',
-                                            'Wednesday',
-                                            'Thursday',
-                                            'Friday',
-                                            'Saturday',
-                                            'Sunday',
+                                            'English',
+                                            'Hindi',
+                                            'Tamil'
                                         ].map(day => (
                                             <SelectItem key={day} label={day} value={day} />
                                         ))}

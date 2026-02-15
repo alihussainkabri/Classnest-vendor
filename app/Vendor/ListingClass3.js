@@ -81,22 +81,10 @@ const ListingClass3 = () => {
 
             setEndTime(date);
             setPickerType(null);
-            // console.log('start', format(startTime, 'hh:mm a'))
-            // console.log('end', format(endTime, 'hh:mm a'))
+            
             console.log('selected day: ', selectedDay)
         }
     };
-
-    // function updateBatches() {
-    //     if (selectedDay, startTime, endTime) {
-    //         setTotalBatches((prev) =>
-    //             prev.includes(item)
-    //                 ? prev.filter((i) => i !== item)
-    //                 : [...prev, item]
-    //         );
-    //     }
-    // }
-
     async function fetchBatches() {
         const response = await fetch(url + "fetchClassWiseBatch/" + class_id, {
             headers: {
