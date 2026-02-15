@@ -18,14 +18,15 @@ import {
 } from '@/components/ui/select';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PhoneInput from "react-native-phone-number-input";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
 
 const ReceiveEnquiries = ({ navigation }) => {
+    const {class_id} = useLocalSearchParams()
     const [value, setValue] = useState('')
     const [countryCode, setCountryCode] = useState('US');
     const [enquiryType, setEnquiryType] = useState('');

@@ -14,7 +14,7 @@ import {
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
@@ -24,41 +24,65 @@ import { url } from '../../helpers';
 
 const AddInstructors = () => {
     const inset = useSafeAreaInsets()
-    const { class_id } = useLocalSearchParams()
+    const { class_id, previous_data } = useLocalSearchParams()
 
     const [name, setName] = useState('')
     const [gender, setGender] = useState('')
     const [age, setAge] = useState('')
     const [language, setLanguage] = useState('')
-    const {user} = useContext(userContext)
+    const { user } = useContext(userContext)
+
+    useEffect(() => {
+        if (previous_data) {
+            if (JSON.parse(previous_data)?.id) {
+                setName(JSON.parse(previous_data)?.name)
+                setGender(JSON.parse(previous_data)?.gender)
+                setAge(JSON.parse(previous_data)?.age)
+                setLanguage(JSON.parse(previous_data)?.languages)
+            }
+        }
+    }, [previous_data])
 
     async function addInstructor() {
         if (name && gender && age && language) {
             const formData = new FormData()
-            formData.append("name",name)
-            formData.append("gender",gender)
-            formData.append("age",age)
-            formData.append("languages",language)
-            formData.append("class_ids",class_id)
-            formData.append("salary_min",'10,000')
-            formData.append("salary_max",'1,00,000')
+            formData.append("name", name)
+            formData.append("gender", gender)
+            formData.append("age", age)
+            formData.append("languages", language)
+            formData.append("class_ids", class_id)
+            formData.append("salary_min", '10,000')
+            formData.append("salary_max", '1,00,000')
 
-            const response = await fetch(url + "create-instructor",{
-                method : 'POST',
-                headers : {
-                    "Authorization" : `Bearer ${user?.token}`
+            let api_url = url + "create-instructor"
+
+            if (previous_data) {
+                if (JSON.parse(previous_data)?.id) {
+                    api_url = url + "edit-instructor/" + JSON.parse(previous_data)?.id
+                }
+            }
+
+            const response = await fetch(api_url, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${user?.token}`
                 },
-                body : formData
+                body: formData
             })
 
-            if (response.ok == true){
+            if (response.ok == true) {
                 const data = await response.json()
-                if (data?.status == 200){
+                if (data?.status == 200) {
                     Toast.success(data?.message)
                     setTimeout(() => {
-                       router.back() 
+                        router.push({
+                            pathname: 'Vendor/InstructorsList',
+                            params: {
+                                class_id
+                            }
+                        })
                     }, 300);
-                }else{
+                } else {
                     Toast.error(data?.message)
                 }
             }
@@ -160,7 +184,10 @@ const AddInstructors = () => {
 
                     <View style={{ alignItems: 'center' }}>
                         <TouchableOpacity onPress={() => addInstructor()} activeOpacity={.8} style={[styles.whiteBTN]}>
-                            <Text style={styles.WhiteBTNText}>Add Instructor</Text>
+                            <Text style={styles.WhiteBTNText}>
+                                {previous_data ? JSON.parse(previous_data)?.id ? 'Edit Instructor' : 'Add Instructor' : 'Add Instructor'}
+
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>

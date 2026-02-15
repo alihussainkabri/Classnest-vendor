@@ -195,7 +195,7 @@ const ListingClass3 = () => {
                                 </TouchableOpacity>
                             </HStack>
 
-                            {totalBatches.length > 0 && totalBatches?.map((item, index) => (
+                            {totalBatches?.length > 0 && totalBatches?.map((item, index) => (
                                 <TouchableOpacity onPress={() => {
                                     setTimeout(() => {
                                         setShowActionsheet(true)
