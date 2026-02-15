@@ -10,11 +10,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
-import { Alert, Dimensions, Image, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
-;
-
 
 const UploadClassImage = ({ navigation }) => {
     const [value, setValue] = useState('')
@@ -92,26 +90,35 @@ const UploadClassImage = ({ navigation }) => {
             </ImageBackground>
 
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
-                <View style={{ marginHorizontal: 16, }}>
-                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <View style={{ marginHorizontal: 16, }}>
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
 
-                    <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
-                        <View style={{flexDirection :'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
-                            <Feather name="upload" size={24} color="#002858" />
-                            <Text style={{fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8}}>Upload</Text>
-                        </View>
+                        <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
+                            <View style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
+                                <Feather name="upload" size={24} color="#002858" />
+                                <Text style={{ fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8 }}>Upload</Text>
+                            </View>
 
-                        <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
-                        <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
-                    </TouchableOpacity>
+                            <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
+                            <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
+                        </TouchableOpacity>
 
-                    {image && (
-                        <Image
-                            source={{ uri: image }}
-                            style={{ width: 200, height: 200, marginTop: 20 }}
-                        />
-                    )}
-                </View>
+                        {image && (
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                                <View style={{ width: '22%' }}>
+                                    <Image
+                                        source={{ uri: image }}
+                                        style={styles.imgs}
+                                    />
+                                    <TouchableOpacity style={styles.closeBTN}>
+                                        <Ionicons name="close-circle" size={24} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
+                    </View>
+                </ScrollView>
 
                 <Modal isOpen={showModal} onClose={() => { setShowModal(false) }} size="full">
                     <ModalBackdrop />
@@ -131,6 +138,8 @@ const UploadClassImage = ({ navigation }) => {
                 </Modal>
 
                 <View style={{ alignItems: 'center' }}>
+                    <Text style={{fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14}}>Add at least one image to continue</Text>
+
                     <TouchableOpacity onPress={() => router.push('Vendor/ReceiveEnquiries')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
@@ -166,7 +175,7 @@ const styles = StyleSheet.create({
         width: '100%',
         backgroundColor: colors.primary,
         padding: 16,
-        marginTop: 16,
+        marginTop: 12,
         borderTopEndRadius: 15,
         borderTopStartRadius: 15,
     },
@@ -189,7 +198,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 16
     },
-    uploadImgCard:{
+    uploadImgCard: {
         backgroundColor: '#FAFAFA',
         borderRadius: 10,
         borderWidth: 3,
@@ -197,7 +206,21 @@ const styles = StyleSheet.create({
         borderColor: '#E3E3E3',
         alignItems: 'center',
         paddingVertical: 22,
-        marginTop: 16
+        marginTop: 16,
+        marginBottom: 10
+    },
+    imgs: {
+        width: '100%',
+        height: undefined,
+        aspectRatio: 1,
+        marginTop: 10,
+        borderRadius: 10,
+        resizeMode: 'cover'
+    },
+    closeBTN: {
+        position: 'absolute',
+        top: 0,
+        right: -8,
     }
 })
 
