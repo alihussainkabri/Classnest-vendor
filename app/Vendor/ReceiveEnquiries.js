@@ -19,7 +19,7 @@ import {
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PhoneInput from "react-native-phone-number-input";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -35,45 +35,69 @@ const ReceiveEnquiries = ({ navigation }) => {
     const { user } = useContext(userContext)
 
     // phone number state
-    const [value, setValue] = useState('')
+    const [phone, setPhone] = useState('')
     const [countryCode, setCountryCode] = useState('IN');
-    
+
     // whatsapp state
-    const [whatsapp,setWhatsapp] = useState("")
+    const [whatsapp, setWhatsapp] = useState("")
 
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
 
+    async function fetchClassData() {
+        const response = await fetch(url + "fetchClassDetails/" + class_id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok === true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                console.log(data)
+                setPhone(data?.details?.calling_number)
+                setWhatsapp(data?.details?.whatsapp_number)
+                setEnquiryType(data?.details?.enquiry_mode)
+            }
+
+        }
+    }
+
+    useEffect(() => {
+        fetchClassData()
+    }, [])
+
     async function submit() {
 
         const formData = new FormData()
         formData.append("enquiry_mode", enquiryType)
-        formData.append("calling_number", value)
-        formData.append("whatsapp_number", checked ? value : whatsapp)
+        formData.append("calling_number", phone)
+        formData.append("whatsapp_number", checked ? phone : whatsapp)
 
         const response = await fetch(url + "add-recieve-inquiry-class/" + class_id, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${user?.token}`
             },
-            body : formData
+            body: formData
         })
 
-        if (response.ok == true){
+        if (response.ok == true) {
             const data = await response.json()
 
-            if (data?.status == 200){
+            if (data?.status == 200) {
                 Toast.success(data?.message)
                 setTimeout(() => {
-                   router.push({
-                    pathname : 'Vendor/UploadClassImage',
-                    params : {
-                        class_id
-                    }
-                   }) 
+                    router.push({
+                        pathname: 'Vendor/UploadClassImage',
+                        params: {
+                            class_id
+                        }
+                    })
                 }, 200);
-            }else{
+            } else {
                 Toast.error(data?.message)
             }
         }
@@ -130,13 +154,10 @@ const ReceiveEnquiries = ({ navigation }) => {
                     <PhoneInput
                         key={countryCode}
                         ref={phoneInputRef}
-                        defaultValue={value}
+                        value={phone}
                         defaultCode={countryCode}
                         layout="first"
-                        onChangeText={(text) => { setValue(text) }}
-                        // onChangeFormattedText={(text) => {
-                        //     setFormattedValue(text);
-                        // }}
+                        onChangeText={(text) => { setPhone(text) }}
                         withShadow
                         autoFocus
                         withFlag={true}
@@ -159,13 +180,10 @@ const ReceiveEnquiries = ({ navigation }) => {
                         <PhoneInput
                             key={countryCode}
                             ref={phoneInputRef}
-                            defaultValue={whatsapp}
+                            value={whatsapp}
                             defaultCode={countryCode}
                             layout="first"
                             onChangeText={(text) => { setWhatsapp(text) }}
-                            // onChangeFormattedText={(text) => {
-                            //     setFormattedValue(text);
-                            // }}
                             withShadow
                             autoFocus
                             withFlag={true}
@@ -194,21 +212,21 @@ const ReceiveEnquiries = ({ navigation }) => {
                     <TouchableOpacity onPress={() => {
                         let error = 0;
 
-                        if (enquiryType && value){
-                            if (!checked){
-                                if (whatsapp){
+                        if (enquiryType && phone) {
+                            if (!checked) {
+                                if (whatsapp) {
 
-                                }else{
+                                } else {
                                     error = error + 1
                                 }
                             }
-                        }else{
+                        } else {
                             error = error + 1
                         }
 
-                        if (error == 0){
+                        if (error == 0) {
                             submit()
-                        }else{
+                        } else {
                             Toast.error("Please fill all details")
                         }
 
