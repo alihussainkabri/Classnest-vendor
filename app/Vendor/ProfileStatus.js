@@ -26,7 +26,8 @@ const ProfileStatus = ({ navigation }) => {
             router.push({
                 pathname : 'Vendor/ListingClass1',
                 params : {
-                    class_id : item?.id ?? ''
+                    class_id : item?.id ?? '',
+                    class_details : JSON.stringify(item)
                 }
             })
         }

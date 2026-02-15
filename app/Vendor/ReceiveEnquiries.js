@@ -19,20 +19,89 @@ import {
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import PhoneInput from "react-native-phone-number-input";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 const ReceiveEnquiries = ({ navigation }) => {
-    const {class_id} = useLocalSearchParams()
-    const [value, setValue] = useState('')
-    const [countryCode, setCountryCode] = useState('US');
+    const { class_id } = useLocalSearchParams()
     const [enquiryType, setEnquiryType] = useState('');
+    const [checked, setChecked] = useState(true);
+    const { user } = useContext(userContext)
+
+    // phone number state
+    const [phone, setPhone] = useState('')
+    const [countryCode, setCountryCode] = useState('IN');
+
+    // whatsapp state
+    const [whatsapp, setWhatsapp] = useState("")
+
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
+
+    async function fetchClassData() {
+        const response = await fetch(url + "fetchClassDetails/" + class_id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok === true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                console.log(data)
+                setPhone(data?.details?.calling_number)
+                setWhatsapp(data?.details?.whatsapp_number)
+                setEnquiryType(data?.details?.enquiry_mode)
+            }
+
+        }
+    }
+
+    useEffect(() => {
+        fetchClassData()
+    }, [])
+
+    async function submit() {
+
+        const formData = new FormData()
+        formData.append("enquiry_mode", enquiryType)
+        formData.append("calling_number", phone)
+        formData.append("whatsapp_number", checked ? phone : whatsapp)
+
+        const response = await fetch(url + "add-recieve-inquiry-class/" + class_id, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            },
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                Toast.success(data?.message)
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/UploadClassImage',
+                        params: {
+                            class_id
+                        }
+                    })
+                }, 200);
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -62,15 +131,20 @@ const ReceiveEnquiries = ({ navigation }) => {
                                     <SelectDragIndicator />
                                 </SelectDragIndicatorWrapper>
                                 {[
-                                    'Monday',
-                                    'Tuesday',
-                                    'Wednesday',
-                                    'Thursday',
-                                    'Friday',
-                                    'Saturday',
-                                    'Sunday',
+                                    {
+                                        label: 'Phone Call Only',
+                                        value: 'phone'
+                                    }, {
+                                        label: 'Whatsapp Only',
+                                        value: 'whatsapp'
+                                    }
+                                    , {
+                                        label: 'Phone & Whatsapp (Recommended)',
+                                        value: 'both'
+                                    }
+
                                 ].map(day => (
-                                    <SelectItem key={day} label={day} value={day} />
+                                    <SelectItem key={day?.value} label={day?.label} value={day?.value} />
                                 ))}
                             </SelectContent>
                         </SelectPortal>
@@ -80,13 +154,10 @@ const ReceiveEnquiries = ({ navigation }) => {
                     <PhoneInput
                         key={countryCode}
                         ref={phoneInputRef}
-                        defaultValue={value}
+                        value={phone}
                         defaultCode={countryCode}
                         layout="first"
-                        onChangeText={(text) => { setValue(text) }}
-                        // onChangeFormattedText={(text) => {
-                        //     setFormattedValue(text);
-                        // }}
+                        onChangeText={(text) => { setPhone(text) }}
                         withShadow
                         autoFocus
                         withFlag={true}
@@ -102,16 +173,64 @@ const ReceiveEnquiries = ({ navigation }) => {
                         flagButtonStyle={{ backgroundColor: '#E6EEFF', borderRadius: 16 }}
                     />
 
-                    <Checkbox style={{ marginLeft: 16, marginTop: 16 }} isDisabled={false} isInvalid={false} size="lg">
+
+                    {!checked && <>
+
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 18 }}>Whatsapp Number</Text>
+                        <PhoneInput
+                            key={countryCode}
+                            ref={phoneInputRef}
+                            value={whatsapp}
+                            defaultCode={countryCode}
+                            layout="first"
+                            onChangeText={(text) => { setWhatsapp(text) }}
+                            withShadow
+                            autoFocus
+                            withFlag={true}
+                            containerStyle={styles.phoneContainer}
+                            textContainerStyle={styles.textInput}
+                            countryPickerProps={{
+                                withEmoji: true,
+                                withFlag: true,
+                                withAlphaFilter: true,
+                                withFilter: true,
+                            }}
+                            placeholder='Enter your whatsapp number'
+                            flagButtonStyle={{ backgroundColor: '#E6EEFF', borderRadius: 16 }}
+                        />
+                    </>}
+
+                    {(enquiryType == 'whatsapp' || enquiryType == 'both') && <Checkbox isChecked={checked} onChange={() => setChecked(!checked)} style={{ marginLeft: 16, marginTop: 16 }} isDisabled={false} isInvalid={false} size="lg">
                         <CheckboxIndicator style={{ borderRadius: 0, borderWidth: 1 }}>
                             <CheckboxIcon as={CheckIcon} />
                         </CheckboxIndicator>
-                        <CheckboxLabel style={{marginLeft: 8}}><Text style={{ fontFamily: fonts.IntMed, fontSize: 10, color: '#666668' }}>Use this number for WhatsApp as well</Text></CheckboxLabel>
-                    </Checkbox>
+                        <CheckboxLabel style={{ marginLeft: 8 }}><Text style={{ fontFamily: fonts.IntMed, fontSize: 10, color: '#666668' }}>Use this number for WhatsApp as well</Text></CheckboxLabel>
+                    </Checkbox>}
                 </View>
 
                 <View style={{ alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => router.push('Vendor/UploadClassImage')} activeOpacity={.8} style={[styles.whiteBTN ,{ marginBottom: inset.bottom}]}>
+                    <TouchableOpacity onPress={() => {
+                        let error = 0;
+
+                        if (enquiryType && phone) {
+                            if (!checked) {
+                                if (whatsapp) {
+
+                                } else {
+                                    error = error + 1
+                                }
+                            }
+                        } else {
+                            error = error + 1
+                        }
+
+                        if (error == 0) {
+                            submit()
+                        } else {
+                            Toast.error("Please fill all details")
+                        }
+
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>

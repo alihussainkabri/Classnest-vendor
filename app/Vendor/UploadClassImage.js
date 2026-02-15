@@ -8,20 +8,25 @@ import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useContext, useState } from 'react';
 import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
+import { userContext } from '../../context/UserContext';
+import { url } from '../../helpers';
 
 const UploadClassImage = ({ navigation }) => {
-    const [value, setValue] = useState('')
-    const [countryCode, setCountryCode] = useState('US');
-    const [enquiryType, setEnquiryType] = useState('');
-    const [image, setImage] = useState(null);
-    const [showModal, setShowModal] = React.useState(false);
+    const { class_id } = useLocalSearchParams()
+    const { user } = useContext(userContext)
+    const [image, setImage] = useState([]);
+    const [thumbnail, setThumbnail] = useState("")
+    const [showModal, setShowModal] = React.useState({
+        show: false,
+        type: null
+    });
 
-    const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
 
     const requestPermissions = async () => {
@@ -35,10 +40,13 @@ const UploadClassImage = ({ navigation }) => {
         return true;
     };
 
-    const pickFromGallery = async () => {
+    const pickFromGallery = async (type) => {
         const hasPermission = await requestPermissions();
         if (!hasPermission) {
-            setShowModal(false)
+            setShowModal({
+                show: false,
+                type: null
+            })
             return;
         }
 
@@ -50,16 +58,26 @@ const UploadClassImage = ({ navigation }) => {
 
         if (!result.canceled) {
             console.log(result.assets[0].uri);
-            setImage(result.assets[0].uri);
+            if (type == "thumbnail") {
+                setThumbnail(result.assets[0])
+            } else {
+                setImage([...image, result.assets[0]]);
+            }
 
-            setShowModal(false)
+            setShowModal({
+                show: false,
+                type: null
+            })
         }
     };
 
-    const openCamera = async () => {
+    const openCamera = async (type) => {
         const hasPermission = await requestPermissions();
         if (!hasPermission) {
-            setShowModal(false)
+            setShowModal({
+                show: false,
+                type: null
+            })
             return;
         }
 
@@ -70,11 +88,102 @@ const UploadClassImage = ({ navigation }) => {
 
         if (!result.canceled) {
             console.log(result.assets[0].uri);
-            setImage(result.assets[0].uri);
+            if (type == "thumbnail") {
+                setThumbnail(result.assets[0])
+            } else {
+                setImage([...image, result.assets[0]]);
+            }
 
-            setShowModal(false)
+            setShowModal({
+                show: false,
+                type: null
+            })
         }
     };
+
+    async function successUpload(params) {
+        const response = await fetch(url + "fetch-current-vendor-progress", {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                let totalCompleted = 0;
+                let totalFields = 0;
+
+                data.list.forEach(item => {
+                    totalFields += item.number_of_checker;
+                    totalCompleted += item.total_field;
+                });
+
+                const percentage = ((totalCompleted / totalFields) * 100).toFixed(2);
+
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/ProfileStatus',
+                        params: {
+                            percentage,
+                            list: JSON.stringify(data?.list)
+                        }
+                    });
+                }, 0);
+            } else {
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/ProfileStatus',
+                        params: {
+                            percentage: 0,
+                            list: JSON.stringify([])
+                        }
+                    });
+                }, 0);
+            }
+        }
+    }
+
+    async function submit() {
+        let images_arr = []
+
+        const formData = new FormData()
+        formData.append("thumbnail", {
+            uri: thumbnail?.uri,
+            name: thumbnail?.fileName,
+            type: thumbnail?.mimeType
+        }, thumbnail?.fileName)
+
+        for (let i = 0; i < image.length; i++) {
+            let image_data = {
+                uri: image[i].uri,
+                name: image[i].fileName,
+                type: image[i].mimeType
+            }
+            images_arr.push(image_data)
+
+            formData.append(`image_${i}`, image_data, image_data.name)
+        }
+
+        const response = await fetch(url + "add-image-class/" + class_id, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            },
+            body: formData
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+            if (data?.status == 200) {
+                Toast.success("Data updated successfully!")
+                successUpload()
+            } else {
+                Toast.error(data?.message)
+            }
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -91,24 +200,28 @@ const UploadClassImage = ({ navigation }) => {
 
             <View style={{ flex: 1, justifyContent: 'space-between' }}>
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <View style={{ marginHorizontal: 16, }}>
-                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
 
-                        <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
+                    <View style={{ marginHorizontal: 16, }}>
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Thumbnail Images</Text>
+
+                        <TouchableOpacity onPress={() => setShowModal({
+                            show: true,
+                            type: 'thumbnail'
+                        })} style={styles.uploadImgCard}>
                             <View style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
                                 <Feather name="upload" size={24} color="#002858" />
                                 <Text style={{ fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8 }}>Upload</Text>
                             </View>
 
                             <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
-                            <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
+                            <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .</Text>
                         </TouchableOpacity>
 
-                        {image && (
+                        {thumbnail && (
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                                 <View style={{ width: '22%' }}>
                                     <Image
-                                        source={{ uri: image }}
+                                        source={{ uri: thumbnail?.uri }}
                                         style={styles.imgs}
                                     />
                                     <TouchableOpacity style={styles.closeBTN}>
@@ -118,18 +231,56 @@ const UploadClassImage = ({ navigation }) => {
                             </View>
                         )}
                     </View>
+
+                    <View style={{ marginHorizontal: 16, }}>
+                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
+
+                        <TouchableOpacity onPress={() => setShowModal({
+                            show: true,
+                            type: 'gallery'
+                        })} style={styles.uploadImgCard}>
+                            <View style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
+                                <Feather name="upload" size={24} color="#002858" />
+                                <Text style={{ fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8 }}>Upload</Text>
+                            </View>
+
+                            <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload images</Text>
+                            <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images</Text>
+                        </TouchableOpacity>
+
+                        {image.length > 0 && (
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                                {image?.map((item, index) => (
+                                    <View key={index} style={{ width: '22%' }}>
+                                        <Image
+                                            source={{ uri: item?.uri }}
+                                            style={styles.imgs}
+                                        />
+                                        <TouchableOpacity style={styles.closeBTN}>
+                                            <Ionicons name="close-circle" size={24} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
+                    </View>
                 </ScrollView>
 
-                <Modal isOpen={showModal} onClose={() => { setShowModal(false) }} size="full">
+                <Modal isOpen={showModal?.show} onClose={() => {
+                    setShowModal({
+                        show: false,
+                        type: null
+                    })
+                }} size="full">
                     <ModalBackdrop />
                     <ModalContent className="mt-auto w-[80%] self-center rounded-3xl bg-white border-0" style={{ marginBottom: Dimensions.get('window').height / 100 * 14, height: 126 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 36 }}>
-                            <TouchableOpacity onPress={pickFromGallery}>
+                            <TouchableOpacity onPress={() => pickFromGallery(showModal?.type)}>
                                 <FontAwesome name="folder-open" style={styles.Modalicon} />
                                 <Text style={styles.modalTXT}>File</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={openCamera}>
+                            <TouchableOpacity onPress={() => openCamera(showModal?.type)}>
                                 <Entypo name="camera" style={styles.Modalicon} />
                                 <Text style={styles.modalTXT}>Camera</Text>
                             </TouchableOpacity>
@@ -138,9 +289,14 @@ const UploadClassImage = ({ navigation }) => {
                 </Modal>
 
                 <View style={{ alignItems: 'center' }}>
-                    <Text style={{fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14}}>Add at least one image to continue</Text>
+                    <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
 
-                    <TouchableOpacity onPress={() => router.push('Vendor/ProfileStatus')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => {
+
+                        if (thumbnail && image.length > 0) {
+                            submit()
+                        }
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>

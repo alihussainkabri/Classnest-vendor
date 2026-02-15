@@ -20,14 +20,49 @@ const ListingClass2 = () => {
     const [state, setState] = useState("")
     const [country, setCountry] = useState("")
     const [address, setAddress] = useState('');
+    const [latitude, setLatitude] = useState('')
+    const [longitude, setLongitude] = useState('')
     useEffect(() => {
         if (formatted) {
             setCountry(JSON?.parse(formatted)?.country)
             setState(JSON?.parse(formatted)?.state)
             setCity(JSON?.parse(formatted)?.city)
             setAddress(JSON?.parse(formatted)?.fullAddress)
+            setLatitude(JSON?.parse(formatted)?.latitude)
+            setLongitude(JSON?.parse(formatted)?.longitude)
         }
     }, [formatted])
+
+    async function fetchClassData() {
+        const response = await fetch(url + "fetchClassDetails/" + class_id, {
+            headers: {
+                "Authorization": `Bearer ${user?.token}`
+            }
+        })
+
+        if (response.ok === true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                console.log(data)
+                let location_data = data?.details?.class_location ? JSON.parse(data?.details?.class_location) : {}
+                
+                setClassMode(data?.details?.mode_of_class)
+                setCountry(location_data?.country)
+                setState(location_data?.state)
+                setCity(location_data?.city)
+                setAddress(location_data?.address)
+                setLatitude(location_data?.latitude)
+                setLongitude(location_data?.longitude)
+                setSelectedGroups(data?.details?.age_groups ? JSON?.parse(data?.details?.age_groups) : [])
+            }
+
+        }
+    }
+
+    useEffect(() => {
+        fetchClassData()
+    }, [])
 
 
 
@@ -56,8 +91,8 @@ const ListingClass2 = () => {
 
         formData.append("mode_of_class", classMode)
         formData.append("class_location", JSON.stringify({
-            latitude: JSON?.parse(formatted)?.latitude,
-            longitude: JSON?.parse(formatted)?.longitude,
+            latitude,
+            longitude,
             city,
             state,
             country,
