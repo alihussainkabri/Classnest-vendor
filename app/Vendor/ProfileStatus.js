@@ -14,7 +14,7 @@ import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, Style
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
 
-const UploadClassImage = ({ navigation }) => {
+const ProfileStatus = ({ navigation }) => {
     const [value, setValue] = useState('')
     const [countryCode, setCountryCode] = useState('US');
     const [enquiryType, setEnquiryType] = useState('');
@@ -84,8 +84,8 @@ const UploadClassImage = ({ navigation }) => {
                     <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
-                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 8 }}>Upload class image</Text>
-                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Show your class, students, or studio to attract more enquiries</Text>
+                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 8 }}>Complete your profile</Text>
+                    <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 13 }}>You are two steps away from completing your profile.</Text>
                 </View>
             </ImageBackground>
 
@@ -140,7 +140,7 @@ const UploadClassImage = ({ navigation }) => {
                 <View style={{ alignItems: 'center' }}>
                     <Text style={{fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14}}>Add at least one image to continue</Text>
 
-                    <TouchableOpacity onPress={() => router.push('Vendor/ProfileStatus')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => router.push('Vendor/ReceiveEnquiries')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>
@@ -224,4 +224,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default UploadClassImage;
+export default ProfileStatus;
