@@ -1,22 +1,36 @@
 import { HStack } from '@/components/ui/hstack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
 
 const ProfileStatus = ({ navigation }) => {
-    const [value, setValue] = useState('')
-    const [countryCode, setCountryCode] = useState('US');
-    const [enquiryType, setEnquiryType] = useState('');
-    const [image, setImage] = useState(null);
-    const [showModal, setShowModal] = React.useState(false);
+    const params_data = useLocalSearchParams()
+    const [list, setList] = useState([])
 
-    const phoneInputRef = useRef(null);
+    useEffect(() => {
+        console.log(params_data)
+        if (params_data?.list) {
+            setList(JSON.parse(params_data?.list))
+        }
+    }, [])
+
     const inset = useSafeAreaInsets()
+
+    function handleRedirection(item){
+        if (item?.key == 'class'){
+            router.push({
+                pathname : 'Vendor/ListingClass1',
+                params : {
+                    class_id : item?.id ?? ''
+                }
+            })
+        }
+    }
 
 
     return (
@@ -38,13 +52,16 @@ const ProfileStatus = ({ navigation }) => {
                         <HStack style={{ marginTop: 20, alignItems: 'center', justifyContent: 'space-between' }}>
                             <View>
                                 <Text style={{ fontFamily: fonts.IntMed, fontSize: 13 }}>Question</Text>
-                                <Text style={{ fontFamily: fonts.IntBold, fontSize: 30 }}>6/20</Text>
+                                <Text style={{ fontFamily: fonts.IntBold, fontSize: 30 }}>
+                                    {list?.filter(item => item?.result == 'passed').length}/{list?.length}
+                                </Text>
                             </View>
+
 
                             <AnimatedCircularProgress
                                 size={90}
                                 width={6}
-                                fill={50}
+                                fill={params_data?.percentage}
                                 tintColor={colors.primary}
                                 backgroundColor="#E5E7EB"
                                 rotation={0}
@@ -53,7 +70,7 @@ const ProfileStatus = ({ navigation }) => {
                                 {() => (
                                     <View style={{ alignItems: "center" }}>
                                         <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                                            {50}%
+                                            {params_data?.percentage}%
                                         </Text>
                                         <Text style={{ fontSize: 11 }}>Completed</Text>
                                     </View>
@@ -61,14 +78,15 @@ const ProfileStatus = ({ navigation }) => {
                             </AnimatedCircularProgress>
                         </HStack>
 
-                        <View style={styles.QueCard}>
-                            <Text style={styles.tickIcon}>✔</Text>
-                            <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginLeft: 14 }}>Class Name</Text>
-                        </View>
-                        <View style={styles.QueCard}>
-                            <MaterialCommunityIcons name="clock" size={30} color="#FFCF1F" />
-                            <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginLeft: 14 }}>Class Name</Text>
-                        </View>
+                        {list?.length > 0 && list?.map((item, index) => (
+                            <TouchableOpacity onPress={() => } key={index}>
+                                <View style={styles.QueCard}>
+                                    {item?.result == 'passed' ? <Text style={styles.tickIcon}>✔</Text> : <MaterialCommunityIcons name="clock" size={30} color="#FFCF1F" />}
+
+                                    <Text style={{ fontFamily: fonts.IntSB, fontSize: 16, marginLeft: 14 }}>{item?.title}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
 
                     </View>
                 </ScrollView>

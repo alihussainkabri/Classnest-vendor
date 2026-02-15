@@ -13,7 +13,7 @@ import {
 import { Textarea, TextareaInput } from '@/components/ui/textarea';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,6 +25,7 @@ import { url } from '../../helpers';
 
 const ListingClass1 = () => {
     const inset = useSafeAreaInsets()
+    const {class_id} = useLocalSearchParams()
     const { user } = useContext(userContext)
     const [skills, setSkills] = useState([])
 
@@ -61,7 +62,13 @@ const ListingClass1 = () => {
         formData.append("description", description)
         formData.append("started_year", startYear)
 
-        const response = await fetch(url + "create-class", {
+        let api_url = url + "create-class"
+
+        if (class_id){
+            api_url = url + "edit-class/" + class_id
+        }
+
+        const response = await fetch(api_url, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${user?.token}`
@@ -74,7 +81,11 @@ const ListingClass1 = () => {
 
             if (data.status == 200) {
                 console.log(data)
-                Toast.success("Class Created Successfully!")
+                if (class_id){
+                    Toast.success("Class edited successfully!")
+                }else{
+                    Toast.success("Class Created Successfully!")
+                }
                 setTimeout(() => {
                     router.push({
                         pathname : 'Vendor/ListingClass2',

@@ -1,5 +1,5 @@
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { router, Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import ToastManager from 'toastify-react-native';
@@ -11,6 +11,7 @@ import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import '@/global.css';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { url } from '../helpers';
 
 // export const unstable_settings = {
 //   anchor: '(tabs)',
@@ -30,9 +31,47 @@ export default function RootLayout() {
           const account_data = JSON.parse(account);
 
           if (account_data.token) {
-            setTimeout(() => {
-              router.push("/Vendor/SetupScreen1");
-            }, 0);
+            const response = await fetch(url + "fetch-current-vendor-progress", {
+              headers: {
+                "Authorization": `Bearer ${account_data?.token}`
+              }
+            })
+
+            if (response.ok == true) {
+              const data = await response.json()
+
+              if (data?.status == 200) {
+                let totalCompleted = 0;
+                let totalFields = 0;
+
+                data.list.forEach(item => {
+                  totalFields += item.number_of_checker;
+                  totalCompleted += item.total_field;
+                });
+
+                const percentage = ((totalCompleted / totalFields) * 100).toFixed(2);
+
+                setTimeout(() => {
+                  router.push({
+                    pathname : 'Vendor/ProfileStatus',
+                    params : {
+                      percentage,
+                      list : JSON.stringify(data?.list)
+                    }
+                  });
+                }, 0);
+              } else {
+                setTimeout(() => {
+                  router.push({
+                    pathname : 'Vendor/ProfileStatus',
+                    params : {
+                      percentage : 0,
+                      list : JSON.stringify([])
+                    }
+                  });
+                }, 0);
+              }
+            }
           }
         }
       } catch (err) {
