@@ -32,7 +32,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="Classes/explore"
+                name="Classes/PromoteClasses"
                 options={{
                     title: 'Classes',
                     tabBarLabel: ({ focused, color }) => (<Text style={{ color, fontFamily: focused ? fonts.IntBold : fonts.IntMed, fontSize: 12 }}>
@@ -52,7 +52,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="Profile/explore"
+                name="Profile/ProfilePage"
                 options={{
                     title: 'Profile',
                     tabBarLabel: ({ focused, color }) => (<Text style={{ color, fontFamily: focused ? fonts.IntBold : fonts.IntMed, fontSize: 12 }}>

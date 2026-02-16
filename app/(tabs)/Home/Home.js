@@ -1,17 +1,7 @@
 import { HStack } from '@/components/ui/hstack';
-import {
-  Modal,
-  ModalBackdrop,
-  ModalContent
-} from '@/components/ui/modal';
-import { Textarea, TextareaInput } from '@/components/ui/textarea';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
-import Feather from '@expo/vector-icons/Feather';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -120,71 +110,8 @@ const Home = () => {
                 <Text style={{ fontFamily: fonts.IntReg, fontSize: 10 }}>We’ll notify you once it’s approved (24–48 hrs)</Text>
               </View>
             </View>
-
-            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Description </Text>
-            <Textarea
-              size="md"
-              isReadOnly={false}
-              isInvalid={false}
-              isDisabled={false}
-              style={{ width: '100%', borderWidth: 0, marginTop: 12, color: "#666D80" }}
-            >
-              <TextareaInput value={description}
-                onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="Issuing organization and year" />
-            </Textarea>
-
-            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Certificate Images <Text style={{ fontFamily: fonts.IntMed, fontSize: 12 }}>(max : 10)</Text></Text>
-
-            <TouchableOpacity onPress={() => setShowModal(true)} style={styles.uploadImgCard}>
-              <View style={{ flexDirection: 'row', borderRadius: 8, borderWidth: 2, borderColor: '#DFDFDF', alignItems: 'center', marginBottom: 14, paddingVertical: 8, paddingHorizontal: 16 }}>
-                <Feather name="upload" size={24} color="#002858" />
-                <Text style={{ fontFamily: fonts.IntSB, color: '#17181C', fontSize: 16, marginLeft: 8 }}>Upload</Text>
-              </View>
-
-              <Text style={{ fontFamily: fonts.IntReg, fontSize: 13, color: '#17181C', marginBottom: 6 }}>Tap to upload Certificate images</Text>
-              <Text style={{ fontFamily: fonts.IntMed, fontSize: 11, color: '#9DA2A6' }}>JPG, PNG or WEBP · PDF .  Max 10 images · 20 MB each</Text>
-            </TouchableOpacity>
-
-            {image && (
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                <View style={{ width: '22%' }}>
-                  <Image
-                    source={{ uri: image }}
-                    style={styles.imgs}
-                  />
-                  <TouchableOpacity style={styles.closeBTN}>
-                    <Ionicons name="close-circle" size={24} color="red" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
           </View>
         </ScrollView>
-
-        <Modal isOpen={showModal} onClose={() => { setShowModal(false) }} size="full">
-          <ModalBackdrop />
-          <ModalContent className="mt-auto w-[80%] self-center rounded-3xl bg-white border-0" style={{ marginBottom: Dimensions.get('window').height / 100 * 14, height: 126 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 36 }}>
-              <TouchableOpacity onPress={pickFromGallery}>
-                <FontAwesome name="folder-open" style={styles.Modalicon} />
-                <Text style={styles.modalTXT}>File</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={openCamera}>
-                <Entypo name="camera" style={styles.Modalicon} />
-                <Text style={styles.modalTXT}>Camera</Text>
-              </TouchableOpacity>
-            </View>
-          </ModalContent>
-        </Modal>
-
-        <View style={{ alignItems: 'center' }}>
-          <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
-
-          <TouchableOpacity onPress={() => router.push('Vendor/ProfileStatus')} activeOpacity={.8} style={[styles.whiteBTN]}>
-            <Text style={styles.WhiteBTNText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   )
