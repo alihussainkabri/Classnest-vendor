@@ -17,7 +17,7 @@ const ProfilePage = () => {
 
   const ProfileOptions = [
     { icon: <FontAwesome5 name="user" size={17} color="black" />, title: 'Edit Profile', navigateTo: '' },
-    { icon: <Ionicons name="trophy-outline" size={17} color="black" />, title: 'Awards', navigateTo: '' },
+    { icon: <Ionicons name="trophy-outline" size={17} color="black" />, title: 'Awards', navigateTo: 'Profile/Awards' },
     { icon: <FontAwesome5 name="user-shield" size={14} color="black" />, title: 'Certification', navigateTo: '' },
     { icon: <MaterialIcons name="lock-outline" size={17} color="black" />, title: 'Privacy Policy', navigateTo: '' },
     { icon: <Feather name="info" size={17} color="black" />, title: 'Help Center', navigateTo: '' },
@@ -47,7 +47,7 @@ const ProfilePage = () => {
             </View>
 
             {ProfileOptions?.map((item, index) => (
-              <TouchableOpacity key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'transparent', paddingVertical: 12 }}>
+              <TouchableOpacity onPress={() => router.push(item.navigateTo)} key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'transparent', paddingVertical: 12 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   {item?.icon}
                   <Text style={{ fontFamily: fonts.IntMed, fontSize: 15, marginLeft: 16 }}>{item?.title}</Text>

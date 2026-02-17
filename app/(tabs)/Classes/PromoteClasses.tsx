@@ -24,10 +24,10 @@ const PromoteClasses = () => {
 
     if (response.ok == true) {
       const data = await response.json()
-      
-      if (data?.status == 200){
+
+      if (data?.status == 200) {
         setList(data?.list)
-      }else{
+      } else {
         Toast.error(data?.message)
       }
     }
@@ -82,24 +82,24 @@ const PromoteClasses = () => {
             {list?.length > 0 && list?.map((item, index) => (
               <TouchableOpacity key={index} onPress={() => {
                 router.push({
-                  pathname : 'Classes/ClassDetails.js',
+                  pathname: 'Classes/ClassDetails',
                   params : {
                     class_id : item?.id
                   }
                 })
               }}>
                 <View style={{ backgroundColor: 'white', borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, marginBottom: 12 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <View style={{ flex: 1, marginRight: 8 }}>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 18, flexShrink: 1, color: '#002858' }} numberOfLines={2} ellipsizeMode="tail">{item?.display_name}</Text>
-                    {item?.class_location && <Text style={{ textTransform : 'capitalize',fontFamily: fonts.IntBold, fontSize: 14, color: '#002858', marginTop: 10 }}><FontAwesome6 name="location-dot" size={16} color={ColorsList[index].dark} />  {item?.class_location && JSON?.parse(item?.class_location)?.address}</Text>}
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={{ fontFamily: fonts.IntBold, fontSize: 18, flexShrink: 1, color: '#002858' }} numberOfLines={2} ellipsizeMode="tail">{item?.display_name}</Text>
+                      {item?.class_location && <Text style={{ textTransform: 'capitalize', fontFamily: fonts.IntBold, fontSize: 14, color: '#002858', marginTop: 10 }}><FontAwesome6 name="location-dot" size={16} color={ColorsList[index].dark} />  {item?.class_location && JSON?.parse(item?.class_location)?.address}</Text>}
+                    </View>
+                    <Image source={{ uri: `${node_url}${item?.thumbnail_images}` }} style={{ width: 40, height: 40, borderRadius: 100, resizeMode: 'cover' }} />
                   </View>
-                  <Image source={{uri : `${node_url}${item?.thumbnail_images}`}} style={{ width: 40, height: 40, borderRadius: 100, resizeMode: 'cover' }} />
-                </View>
 
-                <View style={{ width: '100%', height: 3, backgroundColor: ColorsList[index].light, borderRadius: 10, marginVertical: 16 }}></View>
-                <Text style={{ fontFamily: fonts.IntBold, fontSize: 12 }}><FontAwesome5 name="clock" size={16} color="black" /> 9:00AM - 6:00PM (10 slots)</Text>
-              </View>
+                  <View style={{ width: '100%', height: 3, backgroundColor: ColorsList[index].light, borderRadius: 10, marginVertical: 16 }}></View>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 12 }}><FontAwesome5 name="clock" size={16} color="black" /> 9:00AM - 6:00PM (10 slots)</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
