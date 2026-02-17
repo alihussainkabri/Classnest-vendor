@@ -9,13 +9,13 @@ import { colors, fonts } from '../../../config/Config';
 import { userContext } from '../../../context/UserContext';
 import { node_url, url } from '../../../helpers';
 
-const Awards = () => {
+const Certificates = () => {
 
       const [list, setList] = useState([])
       const { user } = useContext(userContext)
 
       async function fetchAwards() {
-        const response = await fetch(url + "fetch-awards", {
+        const response = await fetch(url + "fetch-certificate", {
           headers: {
             "Authorization": `Bearer ${user?.token}`
           }
@@ -36,17 +36,6 @@ const Awards = () => {
         fetchAwards()
       }, [])
 
-
-    const testArr = [
-        { dark: "Award", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 1", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-        { dark: "Award 12", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
-    ]
     const inset = useSafeAreaInsets()
     return (
         <View style={styles.container}>
@@ -57,7 +46,7 @@ const Awards = () => {
                         <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                             <Ionicons name="arrow-back" size={22} color="white" />
                         </TouchableOpacity>
-                        <Text style={{ marginTop: 3, marginLeft: 4, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 3 }}>Awards</Text>
+                        <Text style={{ marginTop: 3, marginLeft: 4, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 3 }}>Certificates</Text>
                     </View>
                     <TouchableOpacity>
                         <Image source={require('../../../assets/images/user-icon.png')} style={{ height: 45, width: 45, borderRadius: 100 }} />
@@ -96,9 +85,9 @@ const Awards = () => {
 
             <View style={{ backgroundColor: '#F6F7FB', marginRight: 16, paddingVertical: 8 }}>
                 {/* <TouchableOpacity style={{ position: 'absolute', bottom: 12, right: 12 }}> */}
-                <TouchableOpacity onPress={()=> router.push('Profile/UploadAwards')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, alignSelf: 'flex-end', paddingHorizontal: 26, paddingVertical: 8, borderRadius: 8 }}>
+                <TouchableOpacity onPress={()=> router.push('Profile/UploadCertificate')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, alignSelf: 'flex-end', paddingHorizontal: 26, paddingVertical: 8, borderRadius: 8 }}>
                     <FontAwesome6 name="plus" size={24} color="white" />
-                    <Text style={{color: 'white', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 8}}>Add Award</Text>
+                    <Text style={{color: 'white', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 8}}>Add Certificate</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -180,4 +169,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Awards;
+export default Certificates;
