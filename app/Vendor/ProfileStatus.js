@@ -17,6 +17,10 @@ const ProfileStatus = ({ navigation }) => {
         if (params_data?.list) {
             setList(JSON.parse(params_data?.list))
         }
+
+        if (params_data?.percentage > 99){
+            router.replace('Home/Home')
+        }
     }, [])
 
     const inset = useSafeAreaInsets()

@@ -52,7 +52,7 @@ export default function RootLayout() {
                 const percentage = ((totalCompleted / totalFields) * 100).toFixed(2);
 
                 setTimeout(() => {
-                  router.push({
+                  router.replace({
                     pathname: 'Vendor/ProfileStatus',
                     params: {
                       percentage,
@@ -62,7 +62,7 @@ export default function RootLayout() {
                 }, 0);
               } else {
                 setTimeout(() => {
-                  router.push({
+                  router.replace({
                     pathname: 'Vendor/ProfileStatus',
                     params: {
                       percentage: 0,
@@ -94,9 +94,6 @@ export default function RootLayout() {
               headerShown: false
             }}>
 
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-              <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Auth/Welcome" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Auth/Login" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Auth/Verification" options={{ presentation: 'modal', title: 'yes' }} />
@@ -117,7 +114,8 @@ export default function RootLayout() {
               <Stack.Screen name="Vendor/UploadClassImage" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/ProfileStatus" options={{ presentation: 'modal', title: 'yes' }} />
               <Stack.Screen name="Vendor/UploadAwards" options={{ presentation: 'modal', title: 'yes' }} />
-              {/* <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} /> */}
+              <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>
