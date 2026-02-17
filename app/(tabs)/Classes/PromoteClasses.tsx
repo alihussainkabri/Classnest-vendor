@@ -1,12 +1,42 @@
 import { HStack } from '@/components/ui/hstack';
+import { userContext } from '@/context/UserContext';
+import { node_url, url } from '@/helpers';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import React from 'react';
+import { router } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import { Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../../config/Config';
 
 const PromoteClasses = () => {
+
+  const [list, setList] = useState([])
+  const { user } = useContext(userContext)
+
+  async function fetchClasses() {
+    const response = await fetch(url + "fetch-vendor-classes", {
+      headers: {
+        "Authorization": `Bearer ${user?.token}`
+      }
+    })
+
+    if (response.ok == true) {
+      const data = await response.json()
+      
+      if (data?.status == 200){
+        setList(data?.list)
+      }else{
+        Toast.error(data?.message)
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchClasses()
+  }, [])
+
 
   const ColorsList = [
     { dark: "#6834BA", light: "rgba(104, 52, 186, 0.4)" },
@@ -49,19 +79,28 @@ const PromoteClasses = () => {
       <View style={{ flex: 1, justifyContent: 'space-between' }}>
         <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: '#F6F7FB', paddingBottom: 16 }}>
           <View style={{ marginHorizontal: 16, paddingTop: 28 }}>
-            {testArr?.length > 0 && testArr?.map((item, index) => (
-              <View key={index} style={{ backgroundColor: 'white', borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, marginBottom: 12 }}>
+            {list?.length > 0 && list?.map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => {
+                router.push({
+                  pathname : 'Classes/ClassDetails.js',
+                  params : {
+                    class_id : item?.id
+                  }
+                })
+              }}>
+                <View style={{ backgroundColor: 'white', borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, marginBottom: 12 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, marginRight: 8 }}>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 18, flexShrink: 1, color: '#002858' }} numberOfLines={2} ellipsizeMode="tail">{item}</Text>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 14, color: '#002858', marginTop: 10 }}><FontAwesome6 name="location-dot" size={16} color={ColorsList[index].dark} />  Domlur, Bangalore</Text>
+                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 18, flexShrink: 1, color: '#002858' }} numberOfLines={2} ellipsizeMode="tail">{item?.display_name}</Text>
+                    {item?.class_location && <Text style={{ textTransform : 'capitalize',fontFamily: fonts.IntBold, fontSize: 14, color: '#002858', marginTop: 10 }}><FontAwesome6 name="location-dot" size={16} color={ColorsList[index].dark} />  {item?.class_location && JSON?.parse(item?.class_location)?.address}</Text>}
                   </View>
-                  <Image source={require('../../../assets/images/rounded.png')} style={{ width: 40, height: 40, borderRadius: 100, resizeMode: 'cover' }} />
+                  <Image source={{uri : `${node_url}${item?.thumbnail_images}`}} style={{ width: 40, height: 40, borderRadius: 100, resizeMode: 'cover' }} />
                 </View>
 
                 <View style={{ width: '100%', height: 3, backgroundColor: ColorsList[index].light, borderRadius: 10, marginVertical: 16 }}></View>
                 <Text style={{ fontFamily: fonts.IntBold, fontSize: 12 }}><FontAwesome5 name="clock" size={16} color="black" /> 9:00AM - 6:00PM (10 slots)</Text>
               </View>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
