@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { Text, View } from 'react-native';
 
 const ClassDetails = () => {
   return (
@@ -8,4 +8,4 @@ const ClassDetails = () => {
   )
 }
 
-export default ClassDetails
+export default ClassDetails;

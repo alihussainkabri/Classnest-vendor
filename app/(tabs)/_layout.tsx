@@ -31,8 +31,18 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
                 }}
             />
-            <Tabs.Screen
+            {/* <Tabs.Screen
                 name="Classes/PromoteClasses"
+                options={{
+                    title: 'Classes',
+                    tabBarLabel: ({ focused, color }) => (<Text style={{ color, fontFamily: focused ? fonts.IntBold : fonts.IntMed, fontSize: 12 }}>
+                        Classes
+                    </Text>),
+                    tabBarIcon: ({ color }) => <FontAwesome5 size={21} name="chalkboard-teacher" color={color} />,
+                }}
+            /> */}
+            <Tabs.Screen
+                name="Classes"
                 options={{
                     title: 'Classes',
                     tabBarLabel: ({ focused, color }) => (<Text style={{ color, fontFamily: focused ? fonts.IntBold : fonts.IntMed, fontSize: 12 }}>
