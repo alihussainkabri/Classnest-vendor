@@ -14,7 +14,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts } from '../../config/Config';
+import { colors, fonts } from '../../../config/Config';
 
 const UploadAwards = ({ navigation }) => {
     const [title, setTitle] = useState('')
@@ -79,7 +79,7 @@ const UploadAwards = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
-            <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
+            <ImageBackground source={require('../../../assets/images/above-banner.png')} style={styles.BGImg}>
                 <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
                     <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                         <Ionicons name="arrow-back" size={22} color="white" />
@@ -162,7 +162,7 @@ const UploadAwards = ({ navigation }) => {
                 <View style={{ alignItems: 'center' }}>
                     <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
 
-                    <TouchableOpacity onPress={() => router.push('Vendor/UploadCertificate')} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                    <TouchableOpacity onPress={() => router.push('Vendor/UploadCertificate')} activeOpacity={.8} style={[styles.whiteBTN]}>
                         <Text style={styles.WhiteBTNText}>Continue</Text>
                     </TouchableOpacity>
                 </View>

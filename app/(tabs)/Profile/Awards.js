@@ -1,4 +1,5 @@
 import { HStack } from '@/components/ui/hstack';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -38,6 +39,11 @@ const Awards = () => {
         { dark: "Award", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
         { dark: "Award 1", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
         { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
+        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
+        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
+        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
+        { dark: "Award 2", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
+        { dark: "Award 12", light: "tetst a wd  a wd awd adasdawda wd sd  adwad  asdasd k wadj a sdn  fqjga svna v av va fvad v a dvan va va va sf qavjd s,jzvajhv jh vh`sdhfv " },
     ]
     const inset = useSafeAreaInsets()
     return (
@@ -45,7 +51,7 @@ const Awards = () => {
             <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
             <ImageBackground source={require('../../../assets/images/above-banner.png')} style={styles.BGImg}>
                 <HStack style={{ justifyContent: 'space-between', alignItems: 'center', paddingTop: inset.top + 12, marginHorizontal: 16 }}>
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                         <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                             <Ionicons name="arrow-back" size={22} color="white" />
                         </TouchableOpacity>
@@ -71,7 +77,7 @@ const Awards = () => {
                             //     })
                             // }}
                             >
-                                <View style={{ backgroundColor: 'white', borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, marginBottom: 12 }}>
+                                <View style={{ backgroundColor: 'white', borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, marginTop: 12 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <View style={{ flex: 1, marginRight: 8 }}>
                                             <Text style={{ fontFamily: fonts.IntBold, fontSize: 18, flexShrink: 1, color: '#002858' }} numberOfLines={2} ellipsizeMode="tail">{item?.dark}</Text>
@@ -84,6 +90,14 @@ const Awards = () => {
                         ))}
                     </View>
                 </ScrollView>
+            </View>
+
+            <View style={{ backgroundColor: '#F6F7FB', marginRight: 16, paddingVertical: 8 }}>
+                {/* <TouchableOpacity style={{ position: 'absolute', bottom: 12, right: 12 }}> */}
+                <TouchableOpacity onPress={()=> router.push('Profile/UploadAwards')} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, alignSelf: 'flex-end', paddingHorizontal: 26, paddingVertical: 8, borderRadius: 8 }}>
+                    <FontAwesome6 name="plus" size={24} color="white" />
+                    <Text style={{color: 'white', fontFamily: fonts.IntMed, fontSize: 16, marginLeft: 8}}>Add Award</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
