@@ -20,17 +20,19 @@ import { url } from '../helpers';
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
-  const [user, setUser] = useState("")
+  const [token, setToken] = useState(null)
 
   useEffect(() => {
     const loadAccount = async () => {
       try {
         const account = await AsyncStorage.getItem("classnest_vendor");
-
+        
         if (account) {
           const account_data = JSON.parse(account);
+          
 
           if (account_data.token) {
+            setToken(account_data.token)
             const response = await fetch(url + "fetch-current-vendor-progress", {
               headers: {
                 "Authorization": `Bearer ${account_data?.token}`
@@ -73,6 +75,8 @@ export default function RootLayout() {
               }
             }
           }
+        }else{
+          router.replace("Auth/Welcome")
         }
       } catch (err) {
         console.log("Storage error:", err);
@@ -93,29 +97,33 @@ export default function RootLayout() {
             <Stack screenOptions={{
               headerShown: false
             }}>
+              {token != null ? <>
+                <Stack.Screen name="Vendor/SetupScreen1" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/SetupScreen2" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/SelectCourses" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ReviewDetails" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/DetailSuccess" options={{ presentation: 'modal', title: 'yes' }} />
 
-              <Stack.Screen name="Auth/Welcome" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Auth/Login" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Auth/Verification" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Auth/Success" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ListingClass1" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ListingClass2" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ReceiveEnquiries" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/UploadClassImage" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/ProfileStatus" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/UploadAwards" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </> : <>
+                <Stack.Screen name="Auth/Welcome" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Auth/Login" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Auth/Verification" options={{ presentation: 'modal', title: 'yes' }} />
+                <Stack.Screen name="Auth/Success" options={{ presentation: 'modal', title: 'yes' }} />
+              </>}
 
-              <Stack.Screen name="Vendor/SetupScreen1" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/SetupScreen2" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/SelectCourses" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/ReviewDetails" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/DetailSuccess" options={{ presentation: 'modal', title: 'yes' }} />
 
-              <Stack.Screen name="Vendor/ListingClass1" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/ListingClass2" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/ListingClass3" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/InstructorsList" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/AddInstructors" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/ReceiveEnquiries" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/UploadClassImage" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/ProfileStatus" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/UploadAwards" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="Vendor/UploadCertificate" options={{ presentation: 'modal', title: 'yes' }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>

@@ -11,11 +11,11 @@ import { userContext } from '../../context/UserContext';
 import { url } from '../../helpers';
 
 const Verification = ({ navigation }) => {
-    const {setUser} = useContext(userContext)
+    const { setUser } = useContext(userContext)
     const [isSecure, setIsSecure] = useState(true);
     const timerRef = useRef(null);
-    const { mobile_number,newly_created } = useLocalSearchParams()
-    const [otp,setOTP] = useState("")
+    const { mobile_number, newly_created } = useLocalSearchParams()
+    const [otp, setOTP] = useState("")
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
@@ -76,6 +76,50 @@ const Verification = ({ navigation }) => {
         }
     };
 
+    async function successUpload(token) {
+        const response = await fetch(url + "fetch-current-vendor-progress", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+
+        if (response.ok == true) {
+            const data = await response.json()
+
+            if (data?.status == 200) {
+                let totalCompleted = 0;
+                let totalFields = 0;
+
+                data.list.forEach(item => {
+                    totalFields += item.number_of_checker;
+                    totalCompleted += item.total_field;
+                });
+
+                const percentage = ((totalCompleted / totalFields) * 100).toFixed(2);
+
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/ProfileStatus',
+                        params: {
+                            percentage,
+                            list: JSON.stringify(data?.list)
+                        }
+                    });
+                }, 0);
+            } else {
+                setTimeout(() => {
+                    router.push({
+                        pathname: 'Vendor/ProfileStatus',
+                        params: {
+                            percentage: 0,
+                            list: JSON.stringify([])
+                        }
+                    });
+                }, 0);
+            }
+        }
+    }
+
     async function verifyOTP() {
         const formData = new FormData()
         formData.append("mobile_number", mobile_number)
@@ -91,17 +135,17 @@ const Verification = ({ navigation }) => {
             console.log(data)
             if (data.status == 200) {
                 setUser(data?.user_data)
-                AsyncStorage.setItem("classnest_vendor",JSON.stringify(data?.user_data))
+                AsyncStorage.setItem("classnest_vendor", JSON.stringify(data?.user_data))
                 Toast.success(data?.message)
 
-                
 
-                if (newly_created == "true"){
+
+                if (newly_created == "true") {
                     setTimeout(() => {
-                       router.push('Auth/Success') 
+                        router.push('Auth/Success')
                     }, 200);
-                }else{
-                    router.push("/Vendor/SetupScreen1");
+                } else {
+                    successUpload(data?.user_data?.token)
                 }
             } else {
                 Toast.error(data?.message)
@@ -165,10 +209,10 @@ const Verification = ({ navigation }) => {
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {
-                        if (otp.length == 4){
+                        if (otp.length == 4) {
                             verifyOTP()
-                            
-                        }else{
+
+                        } else {
                             Toast.error("Please enter OTP")
                         }
                     }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: 12 + inset.bottom }]}>
