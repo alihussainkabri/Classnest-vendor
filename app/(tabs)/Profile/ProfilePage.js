@@ -1,5 +1,8 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from 'react';
 import { Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,6 +11,15 @@ import { colors, fonts } from '../../../config/Config';
 const ProfilePage = () => {
 
   const inset = useSafeAreaInsets()
+
+  const ProfileOptions = [
+    { icon: <FontAwesome5 name="user" size={17} color="black" />, title: 'Edit Profile', navigateTo: '' },
+    { icon: <Ionicons name="trophy-outline" size={17} color="black" />, title: 'Awards', navigateTo: '' },
+    { icon: <FontAwesome5 name="user-shield" size={14} color="black" />, title: 'Certification', navigateTo: '' },
+    { icon: <MaterialIcons name="lock-outline" size={17} color="black" />, title: 'Privacy Policy', navigateTo: '' },
+    { icon: <Feather name="info" size={17} color="black" />, title: 'Help Center', navigateTo: '' },
+  ];
+
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
@@ -28,14 +40,23 @@ const ProfilePage = () => {
 
               <Text style={{ fontFamily: fonts.IntBold, fontSize: 20, marginTop: 10 }}>Yahya Japan</Text>
               <Text style={{ fontFamily: fonts.IntSB, fontSize: 14 }}>yahyajapan.yj@gmail.com</Text>
-              <View style={{ height: 1.5, marginVertical: 36, width: '100%', backgroundColor: '#EEEEEE' }}></View>
+              <View style={{ height: 1.5, marginTop: 36, marginBottom: 24, width: '100%', backgroundColor: '#EEEEEE' }}></View>
             </View>
 
-            <TouchableOpacity>
-              <View>
-                <FontAwesome5 name="user" size={16} color="black" />
-                <Text style={{fontFamily: fonts.IntMed, fontSize: 14}}>Edit Profile</Text>
-              </View>
+            {ProfileOptions?.map((item, index) => (
+              <TouchableOpacity key={index} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'transparent', paddingVertical: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {item?.icon}
+                  <Text style={{ fontFamily: fonts.IntMed, fontSize: 15, marginLeft: 16 }}>{item?.title}</Text>
+                </View>
+
+                <AntDesign name="right" size={18} color="black" />
+              </TouchableOpacity>
+            ))}
+
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent', paddingVertical: 12 }}>
+              <MaterialIcons name="logout" size={17} color="#FF0004" />
+              <Text style={{ fontFamily: fonts.IntBold, color: '#FF0004', fontSize: 15, marginLeft: 16 }}>Logout</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
