@@ -3,13 +3,16 @@ import Feather from '@expo/vector-icons/Feather';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import React from 'react';
-import { Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { useContext } from 'react';
+import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../../config/Config';
+import { userContext } from '../../../context/UserContext';
 
 const ProfilePage = () => {
-
+  const {setUser} = useContext(userContext)
   const inset = useSafeAreaInsets()
 
   const ProfileOptions = [
@@ -54,7 +57,22 @@ const ProfilePage = () => {
               </TouchableOpacity>
             ))}
 
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent', paddingVertical: 12 }}>
+            <TouchableOpacity onPress={() => {
+              Alert.alert("Logout","Are you sure you want to logout now",[
+                {
+                  text : 'Cancel',
+                  onPress : () => null
+                },
+                {
+                  text : 'Logout',
+                  onPress : () => {
+                    setUser(null)
+                    AsyncStorage.removeItem("classnest_vendor")
+                    router.push("Auth/Welcome")
+                  }
+                }
+              ])
+            }} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'transparent', paddingVertical: 12 }}>
               <MaterialIcons name="logout" size={17} color="#FF0004" />
               <Text style={{ fontFamily: fonts.IntBold, color: '#FF0004', fontSize: 15, marginLeft: 16 }}>Logout</Text>
             </TouchableOpacity>
