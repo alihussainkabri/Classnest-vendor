@@ -18,7 +18,7 @@ const ProfilePage = () => {
   const ProfileOptions = [
     { icon: <FontAwesome5 name="user" size={17} color="black" />, title: 'Edit Profile', navigateTo: '' },
     { icon: <Ionicons name="trophy-outline" size={17} color="black" />, title: 'Awards', navigateTo: 'Profile/Awards' },
-    { icon: <FontAwesome5 name="user-shield" size={14} color="black" />, title: 'Certification', navigateTo: '' },
+    { icon: <FontAwesome5 name="user-shield" size={14} color="black" />, title: 'Certification', navigateTo: 'Profile/Certificates' },
     { icon: <MaterialIcons name="lock-outline" size={17} color="black" />, title: 'Privacy Policy', navigateTo: '' },
     { icon: <Feather name="info" size={17} color="black" />, title: 'Help Center', navigateTo: '' },
   ];
