@@ -69,7 +69,7 @@ const PromoteClasses = () => {
       <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
       <ImageBackground source={require('../../../assets/images/above-banner.png')} style={styles.BGImg}>
         <HStack style={{ justifyContent: 'space-between', paddingTop: inset.top + 36, marginHorizontal: 16 }}>
-          <Text style={{ marginTop: 3, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 3 }}>Ali Hussain Kabri</Text>
+          <Text style={{ marginTop: 3, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 3 }}>Promote Classes</Text>
           <TouchableOpacity>
             <Image source={require('../../../assets/images/code-icon.png')} style={{ height: 40, width: 40, borderRadius: 100 }} />
           </TouchableOpacity>
@@ -102,6 +102,10 @@ const PromoteClasses = () => {
                 </View>
               </TouchableOpacity>
             ))}
+
+            <TouchableOpacity onPress={() => router.push('Classes/ClassDetails')}>
+              <Text>hi</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
