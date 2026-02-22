@@ -42,7 +42,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="Leads/explore"
+                name="Leads"
                 options={{
                     title: 'Leads',
                     tabBarLabel: ({ focused, color }) => (<Text style={{ color, fontFamily: focused ? fonts.IntBold : fonts.IntMed, fontSize: 12 }}>

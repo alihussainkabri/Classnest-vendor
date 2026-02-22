@@ -13,7 +13,7 @@ import { FlashList } from "@shopify/flash-list";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, FlatList, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../../config/Config';
 
@@ -29,15 +29,18 @@ const ClassDetails = () => {
   const numColumns = 3;
   const itemWidth = (screenWidth - spacing * (numColumns + 1)) / numColumns;
 
+  const TeamSpacing = 16;
+  const TeamItemWidth = (screenWidth - TeamSpacing * 4) / 3;
+
   const images = [
-    { source: require('../../../assets/images/home-verify.png') },
-    { source: require('../../../assets/images/welcome.png') },
-    { source: require('../../../assets/images/react-logo.png') },
-    { source: require('../../../assets/images/successBG.png') },
-    { source: require('../../../assets/images/above-banner.png') },
-    { source: require('../../../assets/images/android-icon-background.png') },
-    { source: require('../../../assets/images/user-icon.png') },
-    { source: require('../../../assets/images/code-icon.png') },
+    { id: 1, source: require('../../../assets/images/home-verify.png'), name: 'yahya' },
+    { id: 2, source: require('../../../assets/images/welcome.png'), name: 'yahya' },
+    { id: 3, source: require('../../../assets/images/react-logo.png'), name: 'yahya' },
+    { id: 4, source: require('../../../assets/images/successBG.png'), name: 'yahya' },
+    { id: 5, source: require('../../../assets/images/above-banner.png'), name: 'yahya' },
+    { id: 6, source: require('../../../assets/images/android-icon-background.png'), name: 'yahya' },
+    { id: 7, source: require('../../../assets/images/user-icon.png'), name: 'yahya' },
+    { id: 8, source: require('../../../assets/images/code-icon.png'), name: 'yahya' },
   ]
 
   const inset = useSafeAreaInsets()
@@ -279,9 +282,39 @@ const ClassDetails = () => {
           </View>
 
           {/* our experts section */}
-          <View style={{marginHorizontal: 16}}>
-            <Text style={{ fontFamily: fonts.IntBold, fontSize: 15, color: '#002858' }}>Meet Our Expert Team</Text>
-            
+          <View style={{}}>
+            <Text style={{ fontFamily: fonts.IntBold, fontSize: 15, color: '#002858', marginHorizontal: 16, marginBottom: 32  }}>Meet Our Expert Team</Text>
+            <FlatList
+              data={images}
+              numColumns={3}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={{ paddingHorizontal: TeamSpacing }}
+              columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 20 }}
+              renderItem={({ item }) => (
+                <View style={{ alignItems: 'center', width: TeamItemWidth }}>
+                  <Image
+                    source={item.source}
+                    style={{
+                      width: TeamItemWidth,
+                      height: TeamItemWidth * 1.1,
+                      borderRadius: 24,
+                    }}
+                    resizeMode="cover"
+                  />
+
+                  <Text
+                    style={{
+                      marginTop: 10,
+                      fontSize: 18,
+                      fontWeight: '600',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+              )}
+            />
           </View>
 
           <View style={{ alignItems: 'center' }}>
