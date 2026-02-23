@@ -121,9 +121,6 @@ export default function RootLayout() {
                 <Stack.Screen name="Auth/Verification" options={{ presentation: 'modal', title: 'yes' }} />
                 <Stack.Screen name="Auth/Success" options={{ presentation: 'modal', title: 'yes' }} />
               </>}
-
-
-
             </Stack>
             <StatusBar style="auto" />
           </ThemeProvider>

@@ -1,5 +1,7 @@
 import { HStack } from '@/components/ui/hstack';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
@@ -100,7 +102,7 @@ const Home = () => {
         </View>
       </ImageBackground>
 
-      <View style={{ flex: 1, justifyContent: 'space-between' }}>
+      <View style={{ justifyContent: 'space-between' }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{ marginHorizontal: 16, }}>
             <View style={{ backgroundColor: '#FFFAE0', borderRadius: 18, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 16, marginTop: 20 }}>
@@ -111,6 +113,52 @@ const Home = () => {
               </View>
             </View>
           </View>
+
+          <View style={[styles.row, { marginHorizontal: 16, marginTop: 20, flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' }]}>
+            <View style={[styles.row, styles.DBcard]}>
+              <Feather name="users" size={16} color="white" style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', padding: 6, borderRadius: 6 }} />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={{ fontFamily: fonts.IntReg, fontSize: 16 }}>Total Leads</Text>
+                <View style={[styles.row, { alignItems: 'flex-end' }]}>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 26 }}>56</Text>
+                  <Text style={{ fontFamily: fonts.IntReg, fontSize: 10, paddingLeft: 8, paddingBottom: 6 }}>+20.90% <FontAwesome6 name="arrow-trend-up" size={12} color="black" /></Text>
+                </View>
+              </View>
+            </View>
+            
+            <View style={[styles.row, styles.DBcard]}>
+              <Feather name="users" size={16} color="white" style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', padding: 6, borderRadius: 6 }} />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={{ fontFamily: fonts.IntReg, fontSize: 16 }}>Total Leads</Text>
+                <View style={[styles.row, { alignItems: 'flex-end' }]}>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 26 }}>56</Text>
+                  <Text style={{ fontFamily: fonts.IntReg, fontSize: 10, paddingLeft: 8, paddingBottom: 6 }}>+20.90% <FontAwesome6 name="arrow-trend-up" size={12} color="black" /></Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.row, styles.DBcard]}>
+              <Feather name="users" size={16} color="white" style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', padding: 6, borderRadius: 6 }} />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={{ fontFamily: fonts.IntReg, fontSize: 16 }}>Total Leads</Text>
+                <View style={[styles.row, { alignItems: 'flex-end' }]}>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 26 }}>56</Text>
+                  <Text style={{ fontFamily: fonts.IntReg, fontSize: 10, paddingLeft: 8, paddingBottom: 6 }}>+20.90% <FontAwesome6 name="arrow-trend-up" size={12} color="black" /></Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.row, styles.DBcard]}>
+              <Feather name="users" size={16} color="white" style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', padding: 6, borderRadius: 6 }} />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={{ fontFamily: fonts.IntReg, fontSize: 16 }}>Total Leads</Text>
+                <View style={[styles.row, { alignItems: 'flex-end' }]}>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 26 }}>56</Text>
+                  <Text style={{ fontFamily: fonts.IntReg, fontSize: 10, paddingLeft: 8, paddingBottom: 6 }}>+20.90% <FontAwesome6 name="arrow-trend-up" size={12} color="black" /></Text>
+                </View>
+              </View>
+            </View>
+          </View>
         </ScrollView>
       </View>
     </View>
@@ -118,6 +166,18 @@ const Home = () => {
 }
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+  },
+
+  DBcard: {
+    backgroundColor: '#EEF3FF',
+    width: '48.5%',
+    paddingTop: 16,
+    paddingBottom: 10,
+    paddingHorizontal: 14,
+    borderRadius: 16
+  },
   container: {
     flex: 1,
     backgroundColor: 'white',
