@@ -16,6 +16,7 @@ const Verification = ({ navigation }) => {
     const timerRef = useRef(null);
     const { mobile_number, newly_created } = useLocalSearchParams()
     const [otp, setOTP] = useState("")
+    const [activeBtn, setActiveBtn] = useState(false)
 
     const phoneInputRef = useRef(null);
     const inset = useSafeAreaInsets()
@@ -182,7 +183,7 @@ const Verification = ({ navigation }) => {
                         onFocus={() => console.log("Focused")}
                         onBlur={() => console.log("Blurred")}
                         onTextChange={handleTextChange}
-                        onFilled={(text) => console.log(`OTP is ${text}`)}
+                        onFilled={() => setActiveBtn(true)}
                         textInputProps={{
                             accessibilityLabel: "One-Time Password",
                         }}
@@ -215,7 +216,7 @@ const Verification = ({ navigation }) => {
                         } else {
                             Toast.error("Please enter OTP")
                         }
-                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: 12 + inset.bottom }]}>
+                    }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: 12 + inset.bottom, backgroundColor: activeBtn ? colors.primary : '#9DA2A6', }]}>
                         <Text style={styles.WhiteBTNText}>Verify</Text>
                     </TouchableOpacity>
                 </View>
@@ -248,7 +249,6 @@ const styles = StyleSheet.create({
     },
     whiteBTN: {
         width: '100%',
-        backgroundColor: '#9DA2A6',
         padding: 16,
         marginTop: 16,
         borderRadius: 15,
@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     },
     OTPcontainer: {
         marginTop: 36,
+        justifyContent: 'space-evenly'
     }
 })
 
