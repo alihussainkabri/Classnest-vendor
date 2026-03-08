@@ -111,7 +111,7 @@ const ReceiveEnquiries = ({ navigation }) => {
                     <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
-                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 18 }}>Let’s List Your First Class</Text>
+                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 24, marginBottom: 18 }}>Let’s List Your First Class</Text>
                     <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Get started by adding your first class details.</Text>
                 </View>
             </ImageBackground>

@@ -24,14 +24,14 @@ const DetailSuccess = () => {
                     <Text style={{ fontFamily: fonts.IntSB, fontSize: 14, paddingHorizontal: 26, textAlign: 'center', color: 'white', marginTop: 16 }}>Your categories are saved. Let’s list your first class.</Text>
                 </View>
 
-                <View style={{ alignItems: 'center' }}>
+                <View style={{ alignItems: 'center',marginBottom: 30 + inset.bottom, }}>
                     <TouchableOpacity onPress={() => router.push('Vendor/ListingClass1')} activeOpacity={.8} style={styles.whiteBTN}>
-                        <Text style={styles.WhiteBTNText}>Update Profile</Text>
+                        <Text style={styles.WhiteBTNText}>List Your First Class</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity  style={{ width: '100%', marginBottom: 30 + inset.bottom,}}>
+                    {/* <TouchableOpacity  onPress={() =} style={{ width: '100%', }}>
                         <Text style={{ fontFamily: fonts.IntSB, fontSize: 14, textAlign: 'center', color: 'white',  }}>Skip for now</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </ImageBackground>
         </View>

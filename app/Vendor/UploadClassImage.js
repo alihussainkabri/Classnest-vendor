@@ -224,7 +224,7 @@ const UploadClassImage = ({ navigation }) => {
                                         source={{ uri: thumbnail?.uri }}
                                         style={styles.imgs}
                                     />
-                                    <TouchableOpacity style={styles.closeBTN}>
+                                    <TouchableOpacity onPress={() => setThumbnail("")} style={styles.closeBTN}>
                                         <Ionicons name="close-circle" size={24} color="red" />
                                     </TouchableOpacity>
                                 </View>

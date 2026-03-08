@@ -100,7 +100,7 @@ const SetupScreen1 = () => {
 
           >
             <InputField value={name}
-              onChangeText={e => setName(e)} placeholder="e.g John Doe" style={{ color: 'red', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+              onChangeText={e => setName(e)} placeholder="e.g John Doe" style={{ color: 'black', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
           </Input>
 
           <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Account Type</Text>

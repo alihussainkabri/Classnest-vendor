@@ -161,10 +161,10 @@ const ListingClass1 = () => {
                         isReadOnly={false}
                         isInvalid={false}
                         isDisabled={false}
-                        style={{ width: '100%', borderWidth: 0, marginTop: 12,color : "#666D80" }}
+                        style={{ width: '100%', borderWidth: 0, marginTop: 12,color : 'black' }}
                     >
-                        <TextareaInput value={description}
-                            onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="What will students learn? Mention skills, levels, and outcomes." />
+                        <TextareaInput  value={description}
+                            onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2',color : '#17181C' }} placeholder="What will students learn? Mention skills, levels, and outcomes." />
                     </Textarea>
 
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Started in</Text>

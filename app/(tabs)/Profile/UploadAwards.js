@@ -153,7 +153,7 @@ const UploadAwards = ({ navigation }) => {
                             style={{ width: '100%', borderWidth: 0, marginTop: 12, color: "#666D80" }}
                         >
                             <TextareaInput value={description}
-                                onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2', }} placeholder="Who issued this award and when?" />
+                                onChangeText={(text) => setDescription(text)} style={{ borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, fontSize: 13, borderColor: '#C6C9D2',color : 'black' }} placeholder="Who issued this award and when?" />
                         </Textarea>
 
                         <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 18, marginTop: 30 }}>Upload Award Images</Text>

@@ -30,6 +30,8 @@ const ListingClass2 = () => {
             setAddress(JSON?.parse(formatted)?.fullAddress)
             setLatitude(JSON?.parse(formatted)?.latitude)
             setLongitude(JSON?.parse(formatted)?.longitude)
+        }else{
+            fetchClassData()
         }
     }, [formatted])
 
@@ -60,9 +62,9 @@ const ListingClass2 = () => {
         }
     }
 
-    useEffect(() => {
-        fetchClassData()
-    }, [])
+    // useEffect(() => {
+    //     fetchClassData()
+    // }, [])
 
 
 
@@ -245,7 +247,7 @@ const ListingClass2 = () => {
                             if (classMode && address && state && city && country && selectedGroups.length > 0) {
                                 submit()
                             } else {
-                                Toast.error("Please fill all details")
+                                Toast.error("Please fill all data")
                             }
                         }} activeOpacity={.8} style={[styles.whiteBTN]}>
                             <Text style={styles.WhiteBTNText}>Continue to class setup</Text>
