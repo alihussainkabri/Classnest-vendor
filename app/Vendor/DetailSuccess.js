@@ -26,7 +26,7 @@ const DetailSuccess = () => {
 
                 <View style={{ alignItems: 'center' }}>
                     <TouchableOpacity onPress={() => router.push('Vendor/ListingClass1')} activeOpacity={.8} style={styles.whiteBTN}>
-                        <Text style={styles.WhiteBTNText}>Update Profile</Text>
+                        <Text style={styles.WhiteBTNText}>List your First class</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity  style={{ width: '100%', marginBottom: 30 + inset.bottom,}}>
