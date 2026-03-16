@@ -99,13 +99,12 @@ const PromoteClasses = () => {
 
                   <View style={{ width: '100%', height: 3, backgroundColor: ColorsList[index].light, borderRadius: 10, marginVertical: 16 }}></View>
                   <Text style={{ fontFamily: fonts.IntBold, fontSize: 12 }}><FontAwesome5 name="clock" size={16} color="black" /> 9:00AM - 6:00PM (10 slots)</Text>
+                  <Text style={{ fontFamily: fonts.IntBold, fontSize: 12 }}>
+                    {item?.is_active == 1 ? 'Pending' : 'Activated'}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
-
-            <TouchableOpacity onPress={() => router.push('Classes/ClassDetails')}>
-              <Text>hi</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>

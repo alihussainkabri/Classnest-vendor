@@ -10,19 +10,20 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { FlashList } from "@shopify/flash-list";
-import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, Dimensions, FlatList, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useContext, useEffect, useState } from 'react';
+import { Dimensions, FlatList, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../../config/Config';
+import { userContext } from '../../../context/UserContext';
+import { node_url, url } from '../../../helpers';
 
 const ClassDetails = () => {
   const [selectedTab, setSelectedTab] = useState('About')
-  const [description, setDescription] = useState('')
-  const [image, setImage] = useState(null);
-  const [showModal, setShowModal] = React.useState(false);
   const [expanded, setExpanded] = useState(false);
+  const { class_id } = useLocalSearchParams()
+  const { user } = useContext(userContext)
+  const [details, setDetails] = useState("")
 
   const screenWidth = Dimensions.get("window").width;
   const spacing = 12;
@@ -45,63 +46,29 @@ const ClassDetails = () => {
 
   const inset = useSafeAreaInsets()
 
-  const requestPermissions = async () => {
-    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
-    const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  async function classDetails() {
+    const response = await fetch(url + `fetchClassDetails/${class_id}`, {
+      headers: {
+        "Authorization": `Bearer ${user?.token}`
+      }
+    })
 
-    if (!cameraPermission.granted || !mediaPermission.granted) {
-      Alert.alert("Permission required");
-      return false;
+    if (response.ok == true) {
+      const data = await response.json()
+      console.log(JSON.stringify(data))
+      setDetails(data?.details)
     }
-    return true;
-  };
+  }
 
-  const pickFromGallery = async () => {
-    const hasPermission = await requestPermissions();
-    if (!hasPermission) {
-      setShowModal(false)
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.7,
-    });
-
-    if (!result.canceled) {
-      console.log(result.assets[0].uri);
-      setImage(result.assets[0].uri);
-
-      setShowModal(false)
-    }
-  };
-
-  const openCamera = async () => {
-    const hasPermission = await requestPermissions();
-    if (!hasPermission) {
-      setShowModal(false)
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      quality: 0.7,
-    });
-
-    if (!result.canceled) {
-      console.log(result.assets[0].uri);
-      setImage(result.assets[0].uri);
-
-      setShowModal(false)
-    }
-  };
+  useEffect(() => {
+    classDetails()
+  }, [class_id])
 
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <ImageBackground source={require('../../../assets/images/rounded.png')} style={styles.BGImg}>
+        <ImageBackground source={{ uri: `${node_url}${details?.thumbnail_images}` }} style={styles.BGImg}>
           <View style={{ flexDirection: 'row', paddingTop: inset.top + 12, marginHorizontal: 16, justifyContent: 'space-between', alignItems: 'center' }}>
             <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
               <Ionicons name="arrow-back" size={22} color="white" />
@@ -122,7 +89,13 @@ const ClassDetails = () => {
                 );
               }}
             >
-              <MenuItem key="Add account" textValue="Add account">
+              <MenuItem onPress={() => router.push({
+                  pathname : 'Vendor/ListingClass1',
+                  params : {
+                    class_id : class_id,
+                    class_details : JSON.stringify(details)
+                  }
+                })} key="Add account" textValue="Add account">
                 <FontAwesome6 name="edit" size={16} color="black" />
                 <MenuItemLabel size="sm" style={{ marginLeft: 12, color: 'black', fontFamily: fonts.IntReg }} >Edit</MenuItemLabel>
               </MenuItem>
@@ -150,7 +123,9 @@ const ClassDetails = () => {
             </HStack>
 
             <HStack style={{ alignItems: 'center', justifyContent: 'space-between', marginTop: 28, marginBottom: 6 }}>
-              <Text style={{ fontFamily: fonts.IntBold, fontSize: 19, color: '#002858', marginRight: 12 }}>Seed Stark Education</Text>
+              <Text style={{ fontFamily: fonts.IntBold, fontSize: 19, color: '#002858', marginRight: 12 }}>
+                {details?.display_name}
+              </Text>
 
               <HStack style={{ alignItems: 'center', backgroundColor: '#16A34A', borderRadius: 10, paddingVertical: 6, paddingHorizontal: 12 }}>
                 <MaterialIcons name="verified" size={14} color="white" />
@@ -158,7 +133,9 @@ const ClassDetails = () => {
               </HStack>
             </HStack>
 
-            <Text style={{ fontFamily: fonts.IntMed, fontSize: 15 }}>Coding Classes</Text>
+            <Text style={{ fontFamily: fonts.IntMed, fontSize: 15 }}>
+              {details?.category_name}
+            </Text>
             <Text style={{ fontFamily: fonts.IntReg, fontSize: 16, marginTop: 12 }}>Starting From</Text>
             <Text style={{ fontFamily: fonts.IntBold, fontSize: 28 }}>₹5,000 <Text style={{ fontFamily: fonts.IntReg }}>/-</Text></Text>
 
@@ -180,8 +157,10 @@ const ClassDetails = () => {
             <View style={{ marginTop: 32 }}>
               {/* About section */}
               {selectedTab == 'About' && <View>
-                <Text style={{ color: '#002858', fontSize: 17, fontFamily: fonts.IntBold }}>About Seed Stark Education</Text>
-                <Text numberOfLines={expanded ? undefined : 3} ellipsizeMode="tail" style={{ fontSize: 13, fontFamily: fonts.IntReg, marginTop: 12, lineHeight: 24 }}>AboutAboutAboutAbout Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education About Seed Stark Education </Text>
+                <Text style={{ color: '#002858', fontSize: 17, fontFamily: fonts.IntBold }}>About {details?.display_name}</Text>
+                <Text numberOfLines={expanded ? undefined : 3} ellipsizeMode="tail" style={{ fontSize: 13, fontFamily: fonts.IntReg, marginTop: 12, lineHeight: 24 }}>
+                  {details?.description}
+                </Text>
                 <TouchableOpacity onPress={() => setExpanded(!expanded)}>
                   <Text style={{ color: "#37B5FF", marginTop: 4 }}>{expanded ? "Read Less" : "Read More"}</Text>
                 </TouchableOpacity>
@@ -251,41 +230,27 @@ const ClassDetails = () => {
               </HStack>
 
               <HStack style={{ flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', marginBottom: 8 }}>
-                <View style={{ flexDirection: 'row', width: '47%', marginTop: 10 }}>
-                  <Image source={require('../../../assets/images/award.png')} style={{ width: 45, height: 45 }} />
-                  <View style={{ flex: 1, marginLeft: 8 }}>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 8, color: 'white' }}>2012</Text>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 10, color: 'white' }}>Best Teacher Award</Text>
-                    <Text numberOfLines={2} ellipsizeMode='tail' style={{ fontFamily: fonts.IntReg, fontSize: 8, color: 'white' }}>Stark Education aims to seed technology and creative application</Text>
+                {details?.awards?.length > 0 && details?.awards?.map((item, index) => (
+                  <View style={{ flexDirection: 'row', width: '47%', marginTop: 10 }} key={index}>
+                    {item?.file ? <Image source={{uri : `${node_url}${item?.file}`}} style={{ width: 45, height: 45 }} /> : <Image source={require('../../../assets/images/award.png')} style={{ width: 45, height: 45 }} />}
+                    
+                    <View style={{ flex: 1, marginLeft: 8 }}>
+                      <Text style={{ fontFamily: fonts.IntBold, fontSize: 10, color: 'white' }}>{item?.title}</Text>
+                      <Text numberOfLines={2} ellipsizeMode='tail' style={{ fontFamily: fonts.IntReg, fontSize: 9, color: 'white' }}>
+                        {item?.description}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-
-                <View style={{ flexDirection: 'row', width: '47%', marginTop: 10 }}>
-                  <Image source={require('../../../assets/images/award.png')} style={{ width: 45, height: 45 }} />
-                  <View style={{ flex: 1, marginLeft: 8 }}>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 8, color: 'white' }}>2012</Text>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 10, color: 'white' }}>Best Teacher Award</Text>
-                    <Text numberOfLines={2} ellipsizeMode='tail' style={{ fontFamily: fonts.IntReg, fontSize: 8, color: 'white' }}>Stark Education aims to seed technology and creative application</Text>
-                  </View>
-                </View>
-
-                <View style={{ flexDirection: 'row', width: '47%', marginTop: 10 }}>
-                  <Image source={require('../../../assets/images/award.png')} style={{ width: 45, height: 45 }} />
-                  <View style={{ flex: 1, marginLeft: 8 }}>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 8, color: 'white' }}>2012</Text>
-                    <Text style={{ fontFamily: fonts.IntBold, fontSize: 10, color: 'white' }}>Best Teacher Award</Text>
-                    <Text numberOfLines={2} ellipsizeMode='tail' style={{ fontFamily: fonts.IntReg, fontSize: 8, color: 'white' }}>Stark Education aims to seed technology and creative application</Text>
-                  </View>
-                </View>
+                ))}
               </HStack>
             </ImageBackground>
           </View>
 
           {/* our experts section */}
-          <View style={{}}>
-            <Text style={{ fontFamily: fonts.IntBold, fontSize: 15, color: '#002858', marginHorizontal: 16, marginBottom: 32  }}>Meet Our Expert Team</Text>
+          {details?.instructors?.length > 0 && <View>
+            <Text style={{ fontFamily: fonts.IntBold, fontSize: 15, color: '#002858', marginHorizontal: 16, marginBottom: 32 }}>Meet Our Expert Team</Text>
             <FlatList
-              data={images}
+              data={details?.instructors}
               numColumns={3}
               keyExtractor={(item) => item.id.toString()}
               contentContainerStyle={{ paddingHorizontal: TeamSpacing }}
@@ -293,7 +258,7 @@ const ClassDetails = () => {
               renderItem={({ item }) => (
                 <View style={{ alignItems: 'center', width: TeamItemWidth }}>
                   <Image
-                    source={item.source}
+                    source={require('../../../assets/images/home-verify.png')}
                     style={{
                       width: TeamItemWidth,
                       height: TeamItemWidth * 1.1,
@@ -315,15 +280,7 @@ const ClassDetails = () => {
                 </View>
               )}
             />
-          </View>
-
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontFamily: fonts.IntMed, color: '#9DA2A6', fontSize: 10, marginTop: 14 }}>Add at least one image to continue</Text>
-
-            <TouchableOpacity onPress={() => router.push('Vendor/UploadCertificate')} activeOpacity={.8} style={[styles.whiteBTN]}>
-              <Text style={styles.WhiteBTNText}>Continue</Text>
-            </TouchableOpacity>
-          </View>
+          </View>}
         </View>
       </ScrollView>
     </View>
