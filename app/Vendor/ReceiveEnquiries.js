@@ -5,6 +5,7 @@ import {
     CheckboxLabel,
 } from '@/components/ui/checkbox';
 import { CheckIcon } from '@/components/ui/icon';
+import { Input, InputField } from '@/components/ui/input';
 import {
     Select,
     SelectBackdrop,
@@ -17,11 +18,12 @@ import {
     SelectTrigger
 } from '@/components/ui/select';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import PhoneInput from "react-native-phone-number-input";
+import CountryPicker from "react-native-country-picker-modal";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
@@ -33,6 +35,7 @@ const ReceiveEnquiries = ({ navigation }) => {
     const [enquiryType, setEnquiryType] = useState('');
     const [checked, setChecked] = useState(true);
     const { user } = useContext(userContext)
+    const [callingCode, setCallingCode] = useState("91");
 
     // phone number state
     const [phone, setPhone] = useState('')
@@ -40,6 +43,11 @@ const ReceiveEnquiries = ({ navigation }) => {
 
     // whatsapp state
     const [whatsapp, setWhatsapp] = useState("")
+
+    const onSelect = (country) => {
+        setCountryCode(country.cca2);
+        setCallingCode(country.callingCode[0]);
+    };
 
 
     const phoneInputRef = useRef(null);
@@ -111,7 +119,7 @@ const ReceiveEnquiries = ({ navigation }) => {
                     <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
                         <Ionicons name="arrow-back" size={22} color="white" />
                     </TouchableOpacity>
-                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 28, marginBottom: 18 }}>Let’s List Your First Class</Text>
+                    <Text style={{ marginTop: 20, fontFamily: fonts.IntBold, color: 'white', fontSize: 25, marginBottom: 18 }}>Let’s List Your First Class</Text>
                     <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 14 }}>Get started by adding your first class details.</Text>
                 </View>
             </ImageBackground>
@@ -151,7 +159,7 @@ const ReceiveEnquiries = ({ navigation }) => {
                     </Select>
 
                     <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 18 }}>Phone Number</Text>
-                    <PhoneInput
+                    {/* <PhoneInput
                         key={countryCode}
                         ref={phoneInputRef}
                         value={phone}
@@ -171,13 +179,35 @@ const ReceiveEnquiries = ({ navigation }) => {
                         }}
                         placeholder='Enter your phone number'
                         flagButtonStyle={{ backgroundColor: '#E6EEFF', borderRadius: 16 }}
-                    />
+                    /> */}
+
+                    <View style={[styles.phoneContainer, { flexDirection: 'row' }]}>
+                        <View style={styles.flagBox}>
+                            <CountryPicker
+                                countryCode={countryCode}
+                                withFilter
+                                withFlag
+                                withCallingCode={false}
+                                withEmoji={true}
+                                onSelect={onSelect}
+                            />
+                            <Entypo name="chevron-small-down" size={18} color="black" style={{ marginLeft: -14 }} />
+                        </View>
+                        <Input
+                            variant="none"
+                            size="lg"
+                            isRequired
+                            style={{ flex: 1 }}
+                        >
+                            <InputField value={phone} keyboardType="phone-pad" onChangeText={setPhone} placeholder="Enter 10-digit mobile number" style={{ color: '#787878', fontSize: 15, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                        </Input>
+                    </View>
 
 
                     {!checked && <>
 
                         <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 18 }}>Whatsapp Number</Text>
-                        <PhoneInput
+                        {/* <PhoneInput
                             key={countryCode}
                             ref={phoneInputRef}
                             value={whatsapp}
@@ -197,7 +227,29 @@ const ReceiveEnquiries = ({ navigation }) => {
                             }}
                             placeholder='Enter your whatsapp number'
                             flagButtonStyle={{ backgroundColor: '#E6EEFF', borderRadius: 16 }}
-                        />
+                        /> */}
+
+                        <View style={[styles.phoneContainer, { flexDirection: 'row' }]}>
+                            <View style={styles.flagBox}>
+                                <CountryPicker
+                                    countryCode={countryCode}
+                                    withFilter
+                                    withFlag
+                                    withCallingCode={false}
+                                    withEmoji={true}
+                                    onSelect={onSelect}
+                                />
+                                <Entypo name="chevron-small-down" size={18} color="black" style={{ marginLeft: -14 }} />
+                            </View>
+                            <Input
+                                variant="none"
+                                size="lg"
+                                isRequired
+                                style={{ flex: 1 }}
+                            >
+                                <InputField value={whatsapp} keyboardType="phone-pad" onChangeText={setWhatsapp} placeholder="Enter your whatsapp number" style={{ color: '#787878', fontSize: 15, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                            </Input>
+                        </View>
                     </>}
 
                     {(enquiryType == 'whatsapp' || enquiryType == 'both') && <Checkbox isChecked={checked} onChange={() => setChecked(!checked)} style={{ marginLeft: 16, marginTop: 16 }} isDisabled={false} isInvalid={false} size="lg">
@@ -248,13 +300,23 @@ const styles = StyleSheet.create({
         width: '100%',
         height: Dimensions.get('window').height / 100 * 25,
     },
+    flagBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#E6EEFF",
+        paddingHorizontal: 12,
+        borderRadius: 16,
+        height: 60,
+        marginLeft: -1
+    },
     phoneContainer: {
         width: '100%',
         height: 60,
         borderWidth: 1,
         borderColor: '#D9D9D9',
         borderRadius: 16,
-        marginTop: 12
+        marginTop: 12,
+        alignItems: 'center'
     },
     textInput: {
         paddingVertical: 0,

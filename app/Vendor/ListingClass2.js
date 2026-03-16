@@ -3,13 +3,13 @@ import { Input, InputField, InputSlot } from '@/components/ui/input';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
 import { userContext } from '../../context/UserContext';
 import { url } from '../../helpers';
-
 
 const ListingClass2 = () => {
     const inset = useSafeAreaInsets()
@@ -46,7 +46,7 @@ const ListingClass2 = () => {
             if (data?.status == 200) {
                 console.log(data)
                 let location_data = data?.details?.class_location ? JSON.parse(data?.details?.class_location) : {}
-                
+
                 setClassMode(data?.details?.mode_of_class)
                 setCountry(location_data?.country)
                 setState(location_data?.state)
@@ -129,21 +129,32 @@ const ListingClass2 = () => {
     }
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+        <View style={{ flex: 1 }}>
             <View style={styles.container}>
                 <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
-                <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
-                    <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
-                        <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={22} color="white" />
-                        </TouchableOpacity>
-                        <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Let’s List Your First Class</Text>
-                        <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
-                    </View>
-                </ImageBackground>
+                <View style={{ flex: 1 }}>
+                    <KeyboardAwareScrollView
+                        keyboardDismissMode="on-drag"
+                        enableOnAndroid
+                        enableAutomaticScroll
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        extraScrollHeight={120}
+                        contentContainerStyle={{
+                            paddingBottom: 160,
+                        }}
+                    >
+                        <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
+                            <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
+                                <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
+                                    <Ionicons name="arrow-back" size={22} color="white" />
+                                </TouchableOpacity>
+                                <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Let’s List Your First Class</Text>
+                                <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
+                            </View>
+                        </ImageBackground>
 
-                <View style={{ flex: 1, }}>
-                    <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+
                         <View style={{ marginHorizontal: 16, }}>
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Mode of classes</Text>
                             <HStack space="md" style={{ marginTop: 12 }}>
@@ -178,7 +189,7 @@ const ListingClass2 = () => {
                                                 class_id: class_id
                                             }
                                         })
-                                    }}>
+                                    }} style={{ backgroundColor: '#F1F2F4', borderColor: '#C6C9D2', borderRadius: 12, justifyContent: 'center', height: 42, marginLeft: 4, paddingHorizontal: 8 }}>
                                         <Ionicons name="map" size={20} color="#666D80" />
                                     </TouchableOpacity>
                                 </InputSlot>
@@ -204,7 +215,7 @@ const ListingClass2 = () => {
                                         isRequired
                                         style={{ height: 42, marginTop: 12 }}
                                     >
-                                        <InputField value={state} onChangeText={setCity} placeholder="Enter State" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                        <InputField value={state} onChangeText={setState} placeholder="Enter State" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                                     </Input>
                                 </View>
 
@@ -238,9 +249,14 @@ const ListingClass2 = () => {
                                 </TouchableOpacity> */}
                             </HStack>
                         </View>
-                    </ScrollView>
+                    </KeyboardAwareScrollView>
 
-                    <View style={{ alignItems: 'center' }}>
+                    <View style={{
+                        alignItems: 'center', position: "absolute",
+                        bottom: 0,
+                        width: "100%",
+                        backgroundColor: "#fff", paddingBottom: inset.bottom
+                    }}>
                         <TouchableOpacity onPress={() => {
                             if (classMode && address && state && city && country && selectedGroups.length > 0) {
                                 submit()
@@ -253,7 +269,7 @@ const ListingClass2 = () => {
                     </View>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View >
     )
 }
 

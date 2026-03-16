@@ -15,13 +15,13 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
 import { userContext } from '../../context/UserContext';
 import { url } from '../../helpers';
-
 
 const ListingClass1 = () => {
     const inset = useSafeAreaInsets()
@@ -107,23 +107,34 @@ const ListingClass1 = () => {
             }
         }
     }
-
+    
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+        <View style={{ flex: 1, backgroundColor: "#fff" }}>
             <View style={styles.container}>
                 <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
-                <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
-                    <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
-                        <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={22} color="white" />
-                        </TouchableOpacity>
-                        <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Let’s List Your First Class</Text>
-                        <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
-                    </View>
-                </ImageBackground>
+                <View style={{ flex: 1 }}>
+                    <KeyboardAwareScrollView
+                        keyboardDismissMode="on-drag"
+                        enableOnAndroid
+                        enableAutomaticScroll
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps="handled"
+                        extraScrollHeight={120}
+                        contentContainerStyle={{
+                            paddingBottom: 160,
+                        }}
+                    >
+                        <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
+                            <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
+                                <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
+                                    <Ionicons name="arrow-back" size={22} color="white" />
+                                </TouchableOpacity>
+                                <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Let’s List Your First Class</Text>
+                                <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
+                            </View>
+                        </ImageBackground>
 
-                <View style={{ flex: 1, justifyContent: 'space-between' }}>
-                    <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 40 }}>
+
                         <View style={{ marginHorizontal: 16, }}>
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Display name (Class name)</Text>
                             <Input
@@ -181,21 +192,27 @@ const ListingClass1 = () => {
                                     value={startYear} onChangeText={setStartYear} placeholder="e.g. 1997" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                             </Input>
                         </View>
-                    </ScrollView>
-                    <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => {
-                            if (className && classCategory && description && startYear) {
-                                submit()
-                            } else {
-                                Toast.error("Please fill all details")
-                            }
-                        }} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
-                            <Text style={styles.WhiteBTNText}>Continue</Text>
-                        </TouchableOpacity>
-                    </View>
+
+                        <View style={{
+                            alignItems: 'center', position: "absolute",
+                            bottom: 0,
+                            width: "100%",
+                            backgroundColor: "#fff", paddingBottom: inset.bottom
+                        }}>
+                            <TouchableOpacity onPress={() => {
+                                if (className && classCategory && description && startYear) {
+                                    submit()
+                                } else {
+                                    Toast.error("Please fill all details")
+                                }
+                            }} activeOpacity={.8} style={[styles.whiteBTN]}>
+                                <Text style={styles.WhiteBTNText}>Continue</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </KeyboardAwareScrollView>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View >
     )
 }
 
@@ -206,7 +223,7 @@ const styles = StyleSheet.create({
     },
     BGImg: {
         width: '100%',
-        height: Dimensions.get('window').height / 100 * 25,
+        height: Dimensions.get('window').height * .25,
     },
     whiteBTN: {
         width: '100%',

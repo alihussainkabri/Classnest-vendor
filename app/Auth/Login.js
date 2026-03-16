@@ -105,26 +105,26 @@ const Login = ({ navigation }) => {
                         renderDropdownImage={<Text style={{ fontSize: 16 }}>▼</Text>}
                     /> */}
                     <View style={[styles.phoneContainer, { flexDirection: 'row' }]}>
-                    <View style={styles.flagBox}>
-                        <CountryPicker
-                            countryCode={countryCode}
-                            withFilter
-                            withFlag
-                            withCallingCode={false}
-                            withEmoji={true}
-                            onSelect={onSelect}
-                        />
-                        <Entypo name="chevron-small-down" size={18} color="black" style={{marginLeft: -14}} />
+                        <View style={styles.flagBox}>
+                            <CountryPicker
+                                countryCode={countryCode}
+                                withFilter
+                                withFlag
+                                withCallingCode={false}
+                                withEmoji={true}
+                                onSelect={onSelect}
+                            />
+                            <Entypo name="chevron-small-down" size={18} color="black" style={{ marginLeft: -14 }} />
+                        </View>
+                        <Input
+                            variant="none"
+                            size="lg"
+                            isRequired
+                            style={{ flex: 1 }}
+                        >
+                            <InputField value={value} keyboardType="phone-pad" onChangeText={setValue} placeholder="Enter 10-digit mobile number" style={{ color: '#787878', fontSize: 15, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                        </Input>
                     </View>
-                    <Input
-                        variant="none"
-                        size="lg"
-                        isRequired
-                        style={{ flex: 1 }}
-                    >
-                        <InputField value={value} keyboardType="phone-pad" onChangeText={setValue} placeholder="Enter 10-digit mobile number" style={{ color: '#787878', fontSize: 15, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
-                    </Input>
-                </View>
                 </View>
 
                 <View style={{ alignItems: 'center' }}>

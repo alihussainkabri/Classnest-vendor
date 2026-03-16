@@ -100,7 +100,7 @@ const InstructorsList = () => {
                             params : {
                                 class_id
                             }
-                        })} activeOpacity={.8} style={[styles.whiteBTN]}>
+                        })} activeOpacity={.8} style={[styles.whiteBTN, {marginBottom: inset.bottom}]}>
                             <Text style={styles.WhiteBTNText}>Continue</Text>
                         </TouchableOpacity>
                     </View>

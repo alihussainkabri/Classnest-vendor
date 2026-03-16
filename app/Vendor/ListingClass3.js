@@ -222,10 +222,6 @@ const ListingClass3 = () => {
                                     </View>
                                 </TouchableOpacity>
                             ))}
-
-
-
-
                         </View>
                     </ScrollView>
 
@@ -235,7 +231,7 @@ const ListingClass3 = () => {
                             params: {
                                 class_id
                             }
-                        })} activeOpacity={.8} style={[styles.whiteBTN]}>
+                        })} activeOpacity={.8} style={[styles.whiteBTN, {marginBottom: inset.bottom}]}>
                             <Text style={styles.WhiteBTNText}>Continue</Text>
                         </TouchableOpacity>
                     </View>
