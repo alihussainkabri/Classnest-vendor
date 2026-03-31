@@ -12,10 +12,11 @@ import {
     SelectTrigger
 } from '@/components/ui/select';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
@@ -108,6 +109,15 @@ const AddInstructors = () => {
                 <View style={{ flex: 1, }}>
                     <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                         <View style={{ marginHorizontal: 16, }}>
+                            <View style={{ alignItems: 'center', marginTop: 16 }}>
+                                <View>
+                                    <Image source={require('../../assets/images/rounded.png')} style={{ width: 100, height: 100, borderRadius: 100, resizeMode: 'cover' }} />
+                                    <TouchableOpacity style={{ backgroundColor: colors.primary, borderRadius: 100, padding: 6, position: 'absolute', bottom: 0, right: 0 }}>
+                                        <Feather name="edit-2" size={18} color="white" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Instructor Name</Text>
                             <Input
                                 variant="none"
@@ -183,7 +193,7 @@ const AddInstructors = () => {
                     </ScrollView>
 
                     <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => addInstructor()} activeOpacity={.8} style={[styles.whiteBTN]}>
+                        <TouchableOpacity onPress={() => addInstructor()} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                             <Text style={styles.WhiteBTNText}>
                                 {previous_data ? JSON.parse(previous_data)?.id ? 'Edit Instructor' : 'Add Instructor' : 'Add Instructor'}
 

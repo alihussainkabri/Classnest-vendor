@@ -171,6 +171,16 @@ const ListingClass2 = () => {
                                 </TouchableOpacity>
                             </HStack>
 
+                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Country</Text>
+                            <Input
+                                variant="none"
+                                size="lg"
+                                isRequired
+                                style={{ height: 42, marginTop: 12 }}
+                            >
+                                <InputField value={country} placeholder="Country" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                            </Input>
+
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Class Location</Text>
                             <Input
                                 variant="none"
