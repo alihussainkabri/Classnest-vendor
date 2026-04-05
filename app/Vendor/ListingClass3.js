@@ -22,7 +22,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { format, isAfter } from 'date-fns';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Alert, Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
@@ -172,7 +172,7 @@ const ListingClass3 = () => {
     }
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+        <View style={{ flex: 1 }}>
             <View style={styles.container}>
                 <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
                 <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
@@ -339,7 +339,7 @@ const ListingClass3 = () => {
                     {/* batch creation end here */}
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View>
     )
 }
 

@@ -16,6 +16,7 @@ const ListingClass2 = () => {
     const { user } = useContext(userContext)
     const { class_id, formatted } = useLocalSearchParams()
     const [classMode, setClassMode] = useState('Online')
+    const [fees, setFees] = useState("")
     const [city, setCity] = useState("")
     const [state, setState] = useState("")
     const [country, setCountry] = useState("")
@@ -48,6 +49,7 @@ const ListingClass2 = () => {
                 let location_data = data?.details?.class_location ? JSON.parse(data?.details?.class_location) : {}
 
                 setClassMode(data?.details?.mode_of_class)
+                setFees(data?.details?.class_price)
                 setCountry(location_data?.country)
                 setState(location_data?.state)
                 setCity(location_data?.city)
@@ -90,6 +92,7 @@ const ListingClass2 = () => {
         const formData = new FormData()
 
         formData.append("mode_of_class", classMode)
+        formData.append("class_price", fees)
         formData.append("class_location", JSON.stringify({
             latitude,
             longitude,
@@ -171,14 +174,14 @@ const ListingClass2 = () => {
                                 </TouchableOpacity>
                             </HStack>
 
-                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Country</Text>
+                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Course Fees</Text>
                             <Input
                                 variant="none"
                                 size="lg"
                                 isRequired
                                 style={{ height: 42, marginTop: 12 }}
                             >
-                                <InputField value={country} placeholder="Country" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                <InputField value={fees} onChangeText={setFees} keyboardType="numeric" placeholder="Enter amount" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontFamily: fonts.IntReg, paddingLeft: 16 }} />
                             </Input>
 
                             <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Class Location</Text>
@@ -279,7 +282,7 @@ const ListingClass2 = () => {
                     </View>
                 </View>
             </View>
-        </View >
+        </View>
     )
 }
 

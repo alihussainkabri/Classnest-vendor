@@ -1,2 +1,2 @@
-export const node_url = "http://192.168.1.108:3010/"
+export const node_url = "http://192.168.1.101:3010/"
 export const url = node_url + "api/"

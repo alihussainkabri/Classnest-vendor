@@ -3,7 +3,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Dimensions, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, fonts } from '../../config/Config';
 import { userContext } from '../../context/UserContext';
@@ -12,9 +12,9 @@ import { url } from '../../helpers';
 
 const InstructorsList = () => {
     const inset = useSafeAreaInsets()
-    const {class_id} = useLocalSearchParams()
+    const { class_id } = useLocalSearchParams()
     const [instructorsList, setInstructorsList] = useState([])
-    const {user} = useContext(userContext)
+    const { user } = useContext(userContext)
 
     async function fetchInstructors() {
         const response = await fetch(url + "fetchClassWiseInstructor/" + class_id, {
@@ -36,7 +36,7 @@ const InstructorsList = () => {
 
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+        <View style={{ flex: 1 }}>
             <View style={styles.container}>
                 <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
                 <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
@@ -57,8 +57,8 @@ const InstructorsList = () => {
                                 <TouchableOpacity onPress={() => router.push({
                                     pathname: 'Vendor/AddInstructors',
                                     params: {
-                                        class_id : class_id,
-                                        previous_data : JSON.stringify({})
+                                        class_id: class_id,
+                                        previous_data: JSON.stringify({})
                                     }
                                 })} style={{ backgroundColor: '#16A34A', paddingHorizontal: 6, paddingBottom: 4, borderRadius: 4 }}>
                                     <Text style={{ fontFamily: fonts.IntBold, fontSize: 12, color: 'white' }}><Text style={{ fontSize: 18 }}>+ </Text> Add Instructor</Text>
@@ -68,12 +68,12 @@ const InstructorsList = () => {
                             {instructorsList?.length > 0 ? instructorsList?.map((item, index) => (
                                 <TouchableOpacity key={index} onPress={() => {
                                     router.push({
-                                    pathname: 'Vendor/AddInstructors',
-                                    params: {
-                                        class_id : class_id,
-                                        previous_data : JSON.stringify(item)
-                                    }
-                                })
+                                        pathname: 'Vendor/AddInstructors',
+                                        params: {
+                                            class_id: class_id,
+                                            previous_data: JSON.stringify(item)
+                                        }
+                                    })
                                 }} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16 }}>
                                     <HStack alignItems="center" style={{ justifyContent: 'space-between', flex: 1, borderWidth: 1.5, borderColor: '#CDCECF', paddingVertical: 14, paddingHorizontal: 16, borderTopLeftRadius: 6, borderBottomLeftRadius: 6, borderRightWidth: 0 }}>
                                         <HStack alignItems="center">
@@ -89,24 +89,34 @@ const InstructorsList = () => {
                                         <Entypo name="chevron-thin-right" size={24} color="white" />
                                     </View>
                                 </TouchableOpacity>
-                            )) : <Text> no list</Text>}
+                            )) : <View style={styles.NoDataContainer}>
+                                <View style={styles.iconCircle}>
+                                    <Ionicons name="school-outline" size={60} color="#6366f1" />
+                                    <View style={styles.badge}>
+                                        <Ionicons name="search" size={16} color="white" />
+                                    </View>
+                                </View>
+
+                                <Text style={styles.title}>No Instructors Found</Text>
+                                <Text style={styles.subtitle}>We couldn't find any instructors.</Text>
+                            </View>}
 
                         </View>
                     </ScrollView>
 
                     <View style={{ alignItems: 'center' }}>
                         <TouchableOpacity onPress={() => router.push({
-                            pathname : 'Vendor/ReceiveEnquiries',
-                            params : {
+                            pathname: 'Vendor/ReceiveEnquiries',
+                            params: {
                                 class_id
                             }
-                        })} activeOpacity={.8} style={[styles.whiteBTN, {marginBottom: inset.bottom}]}>
+                        })} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
                             <Text style={styles.WhiteBTNText}>Continue</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View>
     )
 }
 
@@ -174,6 +184,48 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         backgroundColor: '#C6C9D2',
         marginHorizontal: 8,
+    },
+
+    NoDataContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 40,
+        backgroundColor: '#fff',
+        marginTop: 60
+    },
+    iconCircle: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#f5f7ff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+    },
+    badge: {
+        position: 'absolute',
+        bottom: 5,
+        right: 10,
+        backgroundColor: '#6366f1',
+        padding: 8,
+        borderRadius: 20,
+        borderWidth: 4,
+        borderColor: '#fff',
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#1f2937',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    subtitle: {
+        fontSize: 15,
+        color: '#6b7280',
+        textAlign: 'center',
+        lineHeight: 22,
+        marginBottom: 32,
     },
 })
 

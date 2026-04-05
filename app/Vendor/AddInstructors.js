@@ -1,3 +1,18 @@
+import {
+    Actionsheet,
+    ActionsheetBackdrop,
+    ActionsheetContent,
+    ActionsheetDragIndicator,
+    ActionsheetDragIndicatorWrapper
+} from '@/components/ui/actionsheet';
+import {
+    Checkbox,
+    CheckboxGroup,
+    CheckboxIcon,
+    CheckboxIndicator,
+    CheckboxLabel,
+    CheckIcon
+} from '@/components/ui/checkbox';
 import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 import {
@@ -16,7 +31,8 @@ import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useContext, useEffect, useState } from 'react';
-import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ImageBackground, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Toast } from 'toastify-react-native';
 import { colors, fonts } from '../../config/Config';
@@ -27,6 +43,7 @@ const AddInstructors = () => {
     const inset = useSafeAreaInsets()
     const { class_id, previous_data } = useLocalSearchParams()
 
+    const [showLangs, setShowLangs] = useState(false)
     const [name, setName] = useState('')
     const [gender, setGender] = useState('')
     const [age, setAge] = useState('')
@@ -92,117 +109,162 @@ const AddInstructors = () => {
         }
     }
 
+    const handleLanguageChange = (values) => {
+        setLanguage(values.join(", "));
+    }
+
     return (
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
+        <View style={{ flex: 1 }}>
             <View style={styles.container}>
                 <StatusBar translucent backgroundColor='transparent' barStyle="light-content" />
-                <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
-                    <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
-                        <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
-                            <Ionicons name="arrow-back" size={22} color="white" />
-                        </TouchableOpacity>
-                        <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Instructor details</Text>
-                        <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
-                    </View>
-                </ImageBackground>
-
-                <View style={{ flex: 1, }}>
-                    <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                        <View style={{ marginHorizontal: 16, }}>
-                            <View style={{ alignItems: 'center', marginTop: 16 }}>
-                                <View>
-                                    <Image source={require('../../assets/images/rounded.png')} style={{ width: 100, height: 100, borderRadius: 100, resizeMode: 'cover' }} />
-                                    <TouchableOpacity style={{ backgroundColor: colors.primary, borderRadius: 100, padding: 6, position: 'absolute', bottom: 0, right: 0 }}>
-                                        <Feather name="edit-2" size={18} color="white" />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Instructor Name</Text>
-                            <Input
-                                variant="none"
-                                size="lg"
-                                isRequired
-                                style={{ height: 42, marginTop: 12 }}
-                            >
-                                <InputField value={name} onChangeText={setName} placeholder="e.g. John Doe" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
-                            </Input>
-
-                            <HStack space="md" style={{ marginTop: 16 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Gender</Text>
-                                    <Select selectedValue={gender} onValueChange={(value) => setGender(value)} style={{ marginTop: 12, }}>
-                                        <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 43 }} variant="outline" size="md">
-                                            <SelectInput placeholder="Select Gender" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
-                                            <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
-                                        </SelectTrigger>
-                                        <SelectPortal>
-                                            <SelectBackdrop />
-                                            <SelectContent>
-                                                <SelectDragIndicatorWrapper>
-                                                    <SelectDragIndicator />
-                                                </SelectDragIndicatorWrapper>
-                                                {[
-                                                    'Male',
-                                                    'Female',
-                                                ].map(item => (
-                                                    <SelectItem key={item} label={item} value={item} />
-                                                ))}
-                                            </SelectContent>
-                                        </SelectPortal>
-                                    </Select>
-                                </View>
-
-                                <View style={{ flex: 1 }}>
-                                    <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Age</Text>
-                                    <Input
-                                        variant="none"
-                                        size="lg"
-                                        isRequired
-                                        style={{ height: 43, marginTop: 12 }}
-                                    >
-                                        <InputField value={age} onChangeText={setAge} placeholder="e.g. 45" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
-                                    </Input>
-                                </View>
-                            </HStack>
-
-                            <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Languages of instruction</Text>
-                            <Select selectionMode="multiple" selectedValue={language} onValueChange={(value) => setLanguage(value)} style={{ marginTop: 10, }}>
-                                <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
-                                    <SelectInput placeholder="Select Language" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
-                                    <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectBackdrop />
-                                    <SelectContent>
-                                        <SelectDragIndicatorWrapper>
-                                            <SelectDragIndicator />
-                                        </SelectDragIndicatorWrapper>
-                                        {[
-                                            'English',
-                                            'Hindi',
-                                            'Tamil'
-                                        ].map(day => (
-                                            <SelectItem key={day} label={day} value={day} />
-                                        ))}
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
-
+                <KeyboardAwareScrollView
+                    keyboardDismissMode="on-drag"
+                    enableOnAndroid
+                    enableAutomaticScroll
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    extraScrollHeight={120}
+                    contentContainerStyle={{
+                        paddingBottom: 160,
+                    }}
+                >
+                    <ImageBackground source={require('../../assets/images/above-banner.png')} style={styles.BGImg}>
+                        <View style={{ paddingTop: inset.top + 4, marginHorizontal: 16 }}>
+                            <TouchableOpacity onPress={() => router.back()} style={{ alignSelf: 'flex-start', padding: 8, paddingLeft: 0 }}>
+                                <Ionicons name="arrow-back" size={22} color="white" />
+                            </TouchableOpacity>
+                            <Text style={{ marginTop: 26, fontFamily: fonts.IntBold, color: 'white', fontSize: 22, marginBottom: 12 }}>Instructor details</Text>
+                            <Text style={{ fontFamily: fonts.IntMed, color: 'white', fontSize: 12 }}>Get started by adding your first class details.</Text>
                         </View>
-                    </ScrollView>
+                    </ImageBackground>
 
-                    <View style={{ alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => addInstructor()} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
-                            <Text style={styles.WhiteBTNText}>
-                                {previous_data ? JSON.parse(previous_data)?.id ? 'Edit Instructor' : 'Add Instructor' : 'Add Instructor'}
+                    <View style={{ flex: 1, }}>
+                        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                            <View style={{ marginHorizontal: 16, }}>
+                                <View style={{ alignItems: 'center', marginTop: 16 }}>
+                                    <View>
+                                        <Image source={require('../../assets/images/rounded.png')} style={{ width: 100, height: 100, borderRadius: 100, resizeMode: 'cover' }} />
+                                        <TouchableOpacity style={{ backgroundColor: colors.primary, borderRadius: 100, padding: 6, position: 'absolute', bottom: 0, right: 0 }}>
+                                            <Feather name="edit-2" size={18} color="white" />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
 
-                            </Text>
-                        </TouchableOpacity>
+                                <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 26 }}>Instructor Name</Text>
+                                <Input
+                                    variant="none"
+                                    size="lg"
+                                    isRequired
+                                    style={{ height: 42, marginTop: 12 }}
+                                >
+                                    <InputField value={name} onChangeText={setName} placeholder="e.g. John Doe" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                </Input>
+
+                                <HStack space="md" style={{ marginTop: 16 }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Gender</Text>
+                                        <Select selectedValue={gender} onValueChange={(value) => setGender(value)} style={{ marginTop: 12, }}>
+                                            <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 43 }} variant="outline" size="md">
+                                                <SelectInput placeholder="Select Gender" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
+                                                <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
+                                            </SelectTrigger>
+                                            <SelectPortal>
+                                                <SelectBackdrop />
+                                                <SelectContent>
+                                                    <SelectDragIndicatorWrapper>
+                                                        <SelectDragIndicator />
+                                                    </SelectDragIndicatorWrapper>
+                                                    {[
+                                                        'Male',
+                                                        'Female',
+                                                    ].map(item => (
+                                                        <SelectItem key={item} label={item} value={item} />
+                                                    ))}
+                                                </SelectContent>
+                                            </SelectPortal>
+                                        </Select>
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16 }}>Age</Text>
+                                        <Input
+                                            variant="none"
+                                            size="lg"
+                                            isRequired
+                                            style={{ height: 43, marginTop: 12 }}
+                                        >
+                                            <InputField value={age} onChangeText={setAge} placeholder="e.g. 45" style={{ color: '#666D80', borderWidth: 1, borderRadius: 12, borderColor: '#C6C9D2', fontSize: 13, fontFamily: fonts.IntReg, paddingLeft: 16 }} />
+                                        </Input>
+                                    </View>
+                                </HStack>
+
+                                <Text style={{ color: '#17181C', fontFamily: fonts.IntSB, fontSize: 16, marginTop: 16 }}>Languages of instruction</Text>
+                                {/* <Select selectionMode="multiple" selectedValue={language} onValueChange={(value) => setLanguage(value)} style={{ marginTop: 10, }}>
+                                    <SelectTrigger style={{ justifyContent: 'space-between', borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 42 }} variant="outline" size="md">
+                                        <SelectInput placeholder="Select Language" fontFamily={fonts.IntReg} fontSize={13} style={{ color: '#666D80' }} />
+                                        <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
+                                    </SelectTrigger>
+                                    <SelectPortal>
+                                        <SelectBackdrop />
+                                        <SelectContent>
+                                            <SelectDragIndicatorWrapper>
+                                                <SelectDragIndicator />
+                                            </SelectDragIndicatorWrapper>
+                                            {[
+                                                'English',
+                                                'Hindi',
+                                                'Tamil'
+                                            ].map(day => (
+                                                <SelectItem key={day} label={day} value={day} />
+                                            ))}
+                                        </SelectContent>
+                                    </SelectPortal>
+                                </Select> */}
+
+                                <TouchableOpacity onPress={() => setShowLangs(true)} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, borderRadius: 12, borderWidth: 1, borderColor: '#C6C9D2', height: 43, marginTop: 16 }}>
+                                    <Text style={{ color: '#666D80', fontFamily: fonts.IntReg, fontSize: 13 }}>Select Gender</Text>
+                                    <AntDesign name="down" size={16} color="#C6C9D2" style={{ marginHorizontal: 12 }} />
+                                </TouchableOpacity>
+
+                                <Actionsheet isOpen={showLangs} onClose={() => setShowLangs(false)}>
+                                    <ActionsheetBackdrop />
+                                    <ActionsheetContent>
+                                        <ActionsheetDragIndicatorWrapper>
+                                            <ActionsheetDragIndicator />
+                                        </ActionsheetDragIndicatorWrapper>
+                                        <View style={{ marginTop: 16, width: '100%', alignItems: 'flex-start' }}>
+                                            <CheckboxGroup value={language.split(", ").filter(Boolean)} onChange={handleLanguageChange}>
+                                                {[
+                                                    'English',
+                                                    'Hindi',
+                                                    'Tamil'
+                                                ].map(lang => (
+                                                    <Checkbox style={{ marginBottom: 16 }} key={lang} value={lang} size="md">
+                                                        <CheckboxIndicator mr="$2">
+                                                            <CheckboxIcon as={CheckIcon} />
+                                                        </CheckboxIndicator>
+                                                        <CheckboxLabel style={{ fontFamily: fonts.IntMed }}>{lang}</CheckboxLabel>
+                                                    </Checkbox>
+                                                ))}
+                                            </CheckboxGroup>
+                                        </View>
+                                    </ActionsheetContent>
+                                </Actionsheet>
+                            </View>
+                        </ScrollView>
                     </View>
+                </KeyboardAwareScrollView>
+
+                <View style={{ alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => addInstructor()} activeOpacity={.8} style={[styles.whiteBTN, { marginBottom: inset.bottom }]}>
+                        <Text style={styles.WhiteBTNText}>
+                            {previous_data ? JSON.parse(previous_data)?.id ? 'Edit Instructor' : 'Add Instructor' : 'Add Instructor'}
+
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View >
     )
 }
 
